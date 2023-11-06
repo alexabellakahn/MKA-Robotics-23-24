@@ -24,6 +24,8 @@ android {
 }
 
 dependencies {
+    implementation 'com.acmerobotics.roadrunner:core:0.5.6'
     implementation project(':FtcRobotController')
+    implementation 'org.openftc:easyopencv:1.7.0'
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
 }
