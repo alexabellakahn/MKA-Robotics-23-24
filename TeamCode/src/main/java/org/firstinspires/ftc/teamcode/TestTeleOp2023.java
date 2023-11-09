@@ -111,9 +111,10 @@ public class TestTeleOp2023 extends LinearOpMode {
             double v2 = r * Math.sin(robotAngle) +rightX+rightY;
             double v3 = r * Math.sin(robotAngle) -rightX+rightY;
             double v4 = r * Math.cos(robotAngle) +rightX+rightY;
+            double k = 1 - .3;
             
             leftFront.setPower(v1);
-            rightFront.setPower(v2);
+            rightFront.setPower(v2*k);
             leftRear.setPower(v3);
             rightRear.setPower(v4);
             
@@ -150,6 +151,35 @@ public class TestTeleOp2023 extends LinearOpMode {
            
            
             double cp=.75;
+            if(gamepad1.dpad_up){
+                rightFront.setPower(-1);
+                leftFront.setPower(-1);
+                rightRear.setPower(-1);
+                leftRear.setPower(-1);
+
+            }
+            if(gamepad1.dpad_down){
+                rightFront.setPower(1);
+                leftFront.setPower(1);
+                rightRear.setPower(1);
+                leftRear.setPower(1);
+
+            }
+            if(gamepad1.dpad_left){
+                rightFront.setPower(-1);
+                leftFront.setPower(1);
+                rightRear.setPower(1);
+                leftRear.setPower(-1);
+
+            }
+            if(gamepad1.dpad_right){
+                rightFront.setPower(1);
+                leftFront.setPower(-1);
+                rightRear.setPower(-1);
+                leftRear.setPower(1);
+
+            }
+
             /*
             if(gamepad1.dpad_left || gamepad1.dpad_right){
                 int movement = gamepad1.dpad_left ? 200 : -200;

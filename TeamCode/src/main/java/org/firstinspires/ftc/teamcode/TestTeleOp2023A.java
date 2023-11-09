@@ -154,6 +154,13 @@ public class TestTeleOp2023A extends LinearOpMode {
                     toggle = !toggle;
                 }
             }
+            if(gamepad1.dpad_up){
+                rightFront.setPower(1);
+                leftFront.setPower(1);
+                rightRear.setPower(1);
+                leftRear.setPower(1);
+
+            }
             /*
             if (gamepad1.right_stick_button) {
                 double startAngle = imu.getAngularOrientation().firstAngle;
