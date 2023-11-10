@@ -1,17 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-/*
-Hey Sean, this is Zain basic summary of what's been done in this branch we have new encoder based functions 
-strafe forward and rotate. Look them over please. Secondly they have an issue I cant seem to work out. 
-They can't run right after each other just because they start overlapping. That's where the main issue lies. 
-Also The encoder on the lift motor stopped working randomly. It would go infinitely, like it wouldn't stop at the desired number. 
-
-
-*/
-
-/*
-package org.firstinspires.ftc.teamcode;
-
 import android.graphics.Bitmap;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -76,9 +64,6 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaSkyStone;
-import org.firstinspires.ftc.robotcore.external.tfod.TfodSkyStone;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -93,22 +78,15 @@ import static android.graphics.Color.red;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 
 
-*/
-/*
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import com.vuforia.Image;
-import com.vuforia.PIXEL_FORMAT;
-import com.vuforia.Vuforia;
-import com.vuforia.Frame;
 import android.app.Activity;
 import android.graphics.Color;
 import android.view.View;
 import static android.graphics.Color.blue;
 import static android.graphics.Color.green;
 import static android.graphics.Color.red;
-*//*
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 
@@ -221,11 +199,9 @@ public class Sle extends LinearOpMode {
         carousel  = hardwareMap.get(DcMotor.class, "carousel");
         gripLeft = hardwareMap.get(Servo.class, "gripLeft");
         gripRight = hardwareMap.get(Servo.class, "gripRight");
-        */
-/*
+
         cSensor = hardwareMap.get(ColorSensor.class, "cs");
         cSensor.enableLed(true);
-        *//*
 
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
@@ -265,26 +241,6 @@ public class Sle extends LinearOpMode {
         gripLeft.setPosition(.55);
         gripRight.setPosition(.55);
         opModeIsActive();
-        
-        */
-/*
-        boolean a,b,c; 
-        if(cSensor.red() > 50){
-            a = true;
-            b = false;
-            c = false;
-        }
-        else if(cSensor.blue() > 50){
-            a = false;
-            b = true;
-            c = false;
-        }
-        else if(cSensor.green() > 50){
-            a = false;
-            b = false;
-            c = true;
-        }
-        *//*
 
         strafe(600,.2,false);
         Forward(1350,.2,true);
@@ -298,4 +254,4 @@ public class Sle extends LinearOpMode {
     telemetry.update();
     }
 }
-*/
+

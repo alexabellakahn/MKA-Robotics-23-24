@@ -13,92 +13,98 @@ import org.openftc.easyopencv.OpenCvPipeline;
 public class SleeveDetectionLeft extends OpenCvPipeline {
     
     // Color definitions
-    private final Scalar YELLOW = new Scalar(255, 255, 0);
-    private final Scalar CYAN = new Scalar(0, 255, 255);
+    private final Scalar RED = new Scalar(255, 255, 0);
+    private final Scalar BLUE = new Scalar(0, 255, 255);
     private final Scalar MAGENTA = new Scalar(255, 0, 255);
-
-    // Determine the color for a given position
-    private Scalar colorOfPosition() {
-        switch (getPosition()) {
-            case "CENTER":
-                return CYAN;
-            case "LEFT":
-                return YELLOW;
-            case "RIGHT":
-                return MAGENTA;
-            default:
-                throw new IllegalStateException("Unknown position");
-        }
-    }
 
     private Telemetry telemetry = null;
 
     // Anchor point definitions
-    
-    private static Point SLEEVE_TOPLEFT_ANCHOR_POINT = new Point(70, 28);
-    public static int REGION_WIDTH = 70, REGION_HEIGHT = 70;
-    
-    private static Point sleeve_pointA = new Point(
-            SLEEVE_TOPLEFT_ANCHOR_POINT.x,
-            SLEEVE_TOPLEFT_ANCHOR_POINT.y);
+    public static int LR_WIDTH = 70, LR_HEIGHT = 70;
+    public static int MID_WIDTH = 70, MID_HEIGHT = 70;
 
-    private static Point sleeve_pointB = new Point(
-            SLEEVE_TOPLEFT_ANCHOR_POINT.x + REGION_WIDTH,
-            SLEEVE_TOPLEFT_ANCHOR_POINT.y + REGION_HEIGHT);
+    private static Point TOPLEFT = new Point(70, 28);
+    private static Point leftBoxA = new Point(
+            TOPLEFT.x,
+            TOPLEFT.y);
 
-    private static Rect targetRect = new Rect(sleeve_pointA, sleeve_pointB);
+    private static Point leftBoxB = new Point(
+            TOPLEFT.x + LR_WIDTH,
+            TOPLEFT.y + LR_HEIGHT);
 
-    // Running variable storing the parking position
-    private volatile String position = "LEFT";
+    private static Point TOPMID = new Point(150, 28);
+    private static Point midBoxA = new Point(
+            TOPMID.x,
+            TOPMID.y);
+
+    private static Point midBoxB = new Point(
+            TOPMID.x + LR_WIDTH,
+            TOPMID.y + LR_HEIGHT);
+
+    private static Point TOPRIGHT = new Point(230, 28);
+
+    private static Point rightBoxA = new Point(
+            TOPRIGHT.x,
+            TOPRIGHT.y);
+
+    private static Point rightBoxB = new Point(
+            TOPRIGHT.x + LR_WIDTH,
+            TOPRIGHT.y + LR_HEIGHT);
+
+
+    private static Rect leftRect = new Rect(leftBoxA, leftBoxB);
+    private static Rect rightRect = new Rect(rightBoxA, rightBoxB);
+    private static Rect midRect = new Rect(midBoxA, midBoxB);
 
     public SleeveDetectionLeft(Telemetry telemetry) {
         this.telemetry = telemetry;
     }
 
+    private static Scalar process(Mat input, Rect targetRect){
+        Mat areaMat = input.submat(targetRect);
+        Scalar sumColors = Core.sumElems(areaMat);
+        areaMat.release();
+
+
+        return sumColors;
+    }
+
     @Override
     public Mat processFrame(Mat input) {
-        // Get the target rectangle (sub-matrix) frame, and then sum all the values
-        Mat areaMat = input.submat(targetRect);
 
-        // We sum the values, where each pixel has a brightness for each channel (with
-        // 0 being the brightest). Given that, the smallest value will be the brightest
-        // color represented.  We can test this by using white and black images and checking
-        // the summed values?  I don't know, the white/black test suggests the opposite!
-        Scalar sumColors = Core.sumElems(areaMat);
+        Scalar leftColors = process(input, leftRect);
+        Scalar rightColors = process(input, rightRect);
+        Scalar midColors = process(input, midRect);
 
-        // Get the minimum RGB value from every single channel
-        double minColor = Math.min(sumColors.val[0], Math.min(sumColors.val[1], sumColors.val[2]));
-
-
-        telemetry.addData("sumColors 0", sumColors.val[0]);
-        telemetry.addData("sumColors 1", sumColors.val[1]);
-        telemetry.addData("sumColors 2", sumColors.val[2]);
+        telemetry.addData("sumColors 0", midColors.val[0]);
+        telemetry.addData("sumColors 1", midColors.val[1]);
+        telemetry.addData("sumColors 2", midColors.val[2]);
         telemetry.update();
 
-        // Change the bounding box color based on the sleeve color
-        if (sumColors.val[0] == minColor)
-            position = "CENTER";
-        else if (sumColors.val[1] == minColor)
-            position = "RIGHT";
-        else
-            position = "LEFT";
-
-        // Change the bounding box color based on the sleeve color
         Imgproc.rectangle(
                 input,
-                sleeve_pointA,
-                sleeve_pointB,
-                colorOfPosition(),
+                leftBoxA,
+                leftBoxB,
+                RED,
                 2
         );
 
-        // Release and return input
-        areaMat.release();
-        return input;
-    }
+        Imgproc.rectangle(
+                input,
+                rightBoxA,
+                rightBoxB,
+                BLUE,
+                2
+        );
 
-    // Returns an enum being the current position where the robot will park
-    public String getPosition() {
-        return position;
+        Imgproc.rectangle(
+                input,
+                midBoxA,
+                midBoxB,
+                RED,
+                2
+        );
+
+        return input;
     }
 }
