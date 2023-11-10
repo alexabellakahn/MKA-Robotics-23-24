@@ -8,8 +8,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-
-//keep
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
@@ -38,6 +36,12 @@ public class TeleOp2023l2024 extends LinearOpMode {
     private Servo grip = null;
 
     private Servo lift = null;
+
+    private Servo plane = null;
+
+    private Servo rightGrip = null;
+
+    private Servo leftGrip = null;
 
     private BNO055IMU imu = null;
 
@@ -70,6 +74,23 @@ public class TeleOp2023l2024 extends LinearOpMode {
             }
         }
     }
+    double leftOpen = 0;
+    double rightOpen = 0;
+
+    public void openGrip(){ //open grabber
+        leftGrip.setPosition(0); //need to test
+        rightGrip.setPosition(0);
+    }
+    public void closeGrip(){ //close grabber
+        leftGrip.setPosition(0); //need to test
+        rightGrip.setPosition(0);
+    }
+
+    public void launchPlane(){
+        plane.setPosition(0);// need to test
+    }
+
+
 
     @Override
     public void runOpMode() {
@@ -85,6 +106,11 @@ public class TeleOp2023l2024 extends LinearOpMode {
         leftRear  = hardwareMap.get(DcMotor.class, "leftRear");
         rightRear = hardwareMap.get(DcMotor.class, "rightRear");
         lift = hardwareMap.get(Servo.class, "lift");
+        rightGrip = hardwareMap.get(Servo.class, "rightGrip");
+        leftGrip = hardwareMap.get(Servo.class, "leftGrip");
+        plane = hardwareMap.get(Servo.class, "plane");
+
+
 
         carousel  = hardwareMap.get(DcMotor.class, "carousel");
         carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -98,9 +124,6 @@ public class TeleOp2023l2024 extends LinearOpMode {
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu.initialize(parameters);
 
-        lift = hardwareMap.get(Servo.class, "lift");
-
-        grip = hardwareMap.get(Servo.class, "grip");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -168,19 +191,30 @@ public class TeleOp2023l2024 extends LinearOpMode {
             }
             carousel.setPower(cp);
 
+            if(gamepad1.y && gamepad1.a) { // y and a pressed at same time = plane l
+                launchPlane();
+            }
+            if(gamepad1.y){// y button pressed = open grip
+                openGrip();
+            }
 
-
-            if(gamepad1.dpad_right){
+            if(gamepad1.b){ // b button pressed = close grip
+                closeGrip();
+            }
+            if(gamepad1.dpad_right){ // right pressed = slider up
                 slideMove(3050, cp);
             }
-            if(gamepad1.dpad_up){
+            if(gamepad1.dpad_up){ // up pressed =
+                lift.setPosition(0);//test
                 slideMove(2323, cp);
+                lift.setPosition(0);//test
+
             }
 
             if(gamepad1.dpad_left){
                 slideMove(1230, cp);
             }
-            if(gamepad1.dpad_down){
+            if(gamepad1.dpad_down){ // down pressed = slide down
                 slideMove(0, cp);
             }
             int z = carousel.getCurrentPosition();
