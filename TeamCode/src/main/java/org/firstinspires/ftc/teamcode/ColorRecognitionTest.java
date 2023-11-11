@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 //keep
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.SleeveDetection;
+import org.firstinspires.ftc.teamcode.SleeveDetectionLeft;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -22,8 +22,8 @@ public class ColorRecognitionTest extends LinearOpMode {
     private DcMotor carousel = null;
     private DcMotor revArm = null;
     private DcMotor lift = null;
-    private Servo gripLeft = null;
-    private Servo gripRight = null;
+    private Servo leftgrip = null;
+    private Servo rightgrip = null;
 
 
     //movement variables
@@ -128,7 +128,7 @@ public class ColorRecognitionTest extends LinearOpMode {
     }
     
     //Telemetry telemetry; 
-    SleeveDetection sleeveDetection; 
+    SleeveDetectionLeft sleeveDetectionLeft;
     OpenCvCamera camera;
     
     // Name of the Webcam to be set in the config
@@ -138,8 +138,8 @@ public class ColorRecognitionTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
-        sleeveDetection = new SleeveDetection(telemetry);
-        camera.setPipeline(sleeveDetection);
+        sleeveDetectionLeft = new SleeveDetectionLeft(telemetry);
+        camera.setPipeline(sleeveDetectionLeft);
         
         //assign configurations
         leftFront  = hardwareMap.get(DcMotor.class, "leftFront");
@@ -149,8 +149,8 @@ public class ColorRecognitionTest extends LinearOpMode {
         carousel  = hardwareMap.get(DcMotor.class, "carousel");
         //cSensor = hardwareMap.get(ColorSensor.class, "cs");
         //cSensor.enableLed(true);
-        gripLeft = hardwareMap.get(Servo.class, "gripLeft");
-        gripRight = hardwareMap.get(Servo.class, "gripRight");
+        leftgrip = hardwareMap.get(Servo.class, "leftGrip");
+        rightgrip = hardwareMap.get(Servo.class, "rightGrip");
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         leftRear.setDirection(DcMotor.Direction.FORWARD);
@@ -192,7 +192,7 @@ public class ColorRecognitionTest extends LinearOpMode {
             @Override
             public void onOpened()
             {
-                camera.startStreaming(320,240, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(960,544, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -200,9 +200,6 @@ public class ColorRecognitionTest extends LinearOpMode {
         });
         String state = "";
         while (!isStarted()) {
-            telemetry.addData("ROTATION: ", sleeveDetection.getPosition());
-            telemetry.update();
-            state = sleeveDetection.getPosition(); 
         }
         
 

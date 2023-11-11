@@ -279,9 +279,12 @@ public class ZainAutoLeftSide extends LinearOpMode {
         });
         String state = "";
         while (!isStarted()) {
+            /*
             telemetry.addData("ROTATION: ", sleeveDetection.getPosition());
             telemetry.update();
-            state = sleeveDetection.getPosition(); 
+            state = sleeveDetection.getPosition();
+            */
+
         }
 
 

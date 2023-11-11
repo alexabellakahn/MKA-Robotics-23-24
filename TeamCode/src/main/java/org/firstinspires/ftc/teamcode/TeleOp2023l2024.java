@@ -43,8 +43,6 @@ public class TeleOp2023l2024 extends LinearOpMode {
 
     private Servo leftGrip = null;
 
-    private BNO055IMU imu = null;
-
     public void movement(){
         double Lpower = 0.58;
         double Rpower = 0.3;
@@ -119,10 +117,6 @@ public class TeleOp2023l2024 extends LinearOpMode {
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         carousel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        imu.initialize(parameters);
 
 
         // Most robots need the motor on one side to be reversed to drive forward
