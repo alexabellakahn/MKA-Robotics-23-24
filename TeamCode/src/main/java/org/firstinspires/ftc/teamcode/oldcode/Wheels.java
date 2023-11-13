@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.oldcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -59,10 +59,6 @@ public class Wheels extends LinearOpMode {
             double v2 = r * Math.cos(robotAngle) -rightX+rightY;
             double v3 = r * Math.cos(robotAngle) +rightX+rightY;
             double v4 = r * Math.sin(robotAngle) -rightX+rightY;
-int xc=2000000000;
-xc = xc*xc;
-
-char z; 
 
             leftFront.setPower(v1);
             rightFront.setPower(v2);

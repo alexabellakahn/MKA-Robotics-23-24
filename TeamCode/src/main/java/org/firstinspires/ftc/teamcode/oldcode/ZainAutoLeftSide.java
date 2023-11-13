@@ -1,14 +1,22 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.oldcode;
+//package org.firstinspires.ftc.teamcode.disabled_samples;
 
 //keep
 //import android.graphics.Bitmap;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.pipelines.SleeveDetectionLeft;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 
 /*
@@ -27,9 +35,9 @@ import static android.graphics.Color.green;
 import static android.graphics.Color.red;
 */
 
-@Autonomous(name="RightSideAuto2023", group ="Concept")
+@Autonomous(name="ALexa Test Thingy2", group ="Concept")
 
-public class RightSideAuto2023 extends LinearOpMode {
+public class ZainAutoLeftSide extends LinearOpMode {
     //IntegratingGyroscope gyro;
     //ModernRoboticsI2cGyro modernRoboticsI2cGyro;
     //DigitalChannel digitalTouch;
@@ -145,16 +153,16 @@ public class RightSideAuto2023 extends LinearOpMode {
 
 
     public static void openGrip(Servo gripLeft, Servo gripRight){
-        gripLeft.setPosition(.6);
-        gripRight.setPosition(.6);
+        gripLeft.setPosition(.43);
+        gripRight.setPosition(.43);
     }
 
     public void closeGrip(Servo gripLeft, Servo gripRight){
-        gripLeft.setPosition(.28);
-        gripRight.setPosition(.28);
+        gripLeft.setPosition(.23);
+        gripRight.setPosition(.23);
     }
     
-    public void accurateRotate(double degrees, double p) {
+    public void degreeRotate(double degrees, double p) {
 
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -163,23 +171,32 @@ public class RightSideAuto2023 extends LinearOpMode {
 
         double currentAngle = imu.getAngularOrientation().firstAngle;
         telemetry.addData("Starting Angle", currentAngle);
-        while (!(currentAngle <= degrees + p*2 && currentAngle >= degrees-p*2)) {
+        
+        while (currentAngle > degrees + 1 || currentAngle < degrees-1) {
             currentAngle = imu.getAngularOrientation().firstAngle;
+            
+            leftFront.setPower((degrees < 0) ? p : -p);
+            rightFront.setPower((degrees < 0) ? -p : p);
+            leftRear.setPower((degrees < 0) ? p : -p);
+            rightRear.setPower((degrees < 0) ? -p : p);
+            
             telemetry.addData("Current Angle", currentAngle);
             telemetry.update();
-            leftFront.setPower((degrees < 1) ? -p : p);
-            rightFront.setPower((degrees < 1) ? p : -p);
-            leftRear.setPower((degrees < 1) ? -p : p);
-            rightRear.setPower((degrees < 1) ? p : -p);
         }
-
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        
+        stop(0);
     }
 
-
+    SleeveDetectionLeft sleeveDetection; 
+    OpenCvCamera camera;
+    
+    // Name of the Webcam to be set in the config
+    String webcamName = "Webcam 1";
 
     @Override public void runOpMode() throws InterruptedException {
         
@@ -187,6 +204,11 @@ public class RightSideAuto2023 extends LinearOpMode {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
+        
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
+        sleeveDetection = new SleeveDetectionLeft(telemetry);
+        camera.setPipeline(sleeveDetection);
 
 
         //assign configurations
@@ -238,13 +260,38 @@ public class RightSideAuto2023 extends LinearOpMode {
 
         closeGrip(gripLeft, gripRight);
         sleep(200);
+        openGrip(gripLeft, gripRight);
+        closeGrip(gripLeft, gripRight);
         carousel.setTargetPosition(100);
         //End of assigning configurations 
+        
+        
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                camera.startStreaming(320,240, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {}
+        });
+        String state = "";
+        while (!isStarted()) {
+            /*
+            telemetry.addData("ROTATION: ", sleeveDetection.getPosition());
+            telemetry.update();
+            state = sleeveDetection.getPosition();
+            */
+
+        }
 
 
         waitForStart();
         opModeIsActive();
-        
+        closeGrip(gripLeft, gripRight);
+        sleep(200);
         //Beginning of Autonomus instructions
         
         //carousel.setTargetPosition(750);
@@ -275,8 +322,67 @@ public class RightSideAuto2023 extends LinearOpMode {
         
         //forward and rotate switch ahhhhhhhhhhhhhhhhh
         
+        // we had around a 70% success rate with this auton
         
-        forward(1465, .3, true);
+        
+        strafe(80,.8,true);
+        sleep(100);
+        forward(1200,.2,false);
+        sleep(100);
+        rotate(295,.4,true);
+        carousel.setTargetPosition(2950);
+        while(carousel.isBusy()){idle();}
+        sleep(100);
+        forward(215,.2, false);
+        sleep(100);
+        openGrip(gripLeft, gripRight);
+        sleep(100);
+        forward(100, .4, true);
+        carousel.setTargetPosition(100);
+        while(carousel.isBusy()){idle();}
+        sleep(100);
+        //rotate(875, .4, true);
+        rotate(915, .3, false);
+        sleep(100);
+        carousel.setTargetPosition(400);
+        while(carousel.isBusy()){idle();}
+        forward(600, .1, false);
+        sleep(500);
+        closeGrip(gripLeft, gripRight);
+        sleep(100);
+        carousel.setTargetPosition(1000);
+        while(carousel.isBusy()){idle();}
+        forward(595, .2, true);
+        sleep(100);
+        rotate(850, .3, false);
+        sleep(100);
+        carousel.setTargetPosition(2170);
+        while(carousel.isBusy()){idle();}
+        forward(230, .2, false);
+        sleep(500);
+        openGrip(gripLeft, gripRight);
+        sleep(100);
+        forward(120, .2, true);
+        sleep(100);
+        carousel.setTargetPosition(600);
+        while(carousel.isBusy()){idle();}
+        rotate(347, .3, true);
+        sleep(100);
+        switch(state){
+            case "LEFT":
+                strafe(625,.2,true);
+                break;
+            case "RIGHT":
+                strafe(725,.2,false);
+                break;
+        
+        }
+        
+        
+        
+        
+        
+       
         
         
         

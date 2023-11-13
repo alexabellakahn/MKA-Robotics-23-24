@@ -1,17 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.oldcode;
 
+//keep
 //import android.graphics.Bitmap;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import java.lang.annotation.Target;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.SleeveDetection;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -32,9 +27,9 @@ import static android.graphics.Color.green;
 import static android.graphics.Color.red;
 */
 
-@Autonomous(name="BlueAllianceAuto2023", group ="Concept")
+@Autonomous(name="RightSideAuto2023", group ="Concept")
 
-public class BlueAllianceAuto2023 extends LinearOpMode {
+public class RightSideAuto2023 extends LinearOpMode {
     //IntegratingGyroscope gyro;
     //ModernRoboticsI2cGyro modernRoboticsI2cGyro;
     //DigitalChannel digitalTouch;
@@ -74,8 +69,8 @@ public class BlueAllianceAuto2023 extends LinearOpMode {
 
     //550 encoder is approximately 24in so 23 per inch
         
-    
-    public void forward(int Rotations, double Targetpow, boolean forward){
+
+    public void forward(int Rotations, double pow, boolean forward){
         int p1 = leftFront.getTargetPosition();
         int p2 = rightFront.getTargetPosition();
         int p3 = leftRear.getTargetPosition();
@@ -84,78 +79,16 @@ public class BlueAllianceAuto2023 extends LinearOpMode {
         rightFront.setTargetPosition((p2 + (Rotations * (forward ? 1 : -1))));
         leftRear.setTargetPosition((p3 + (Rotations * (forward ? 1 : -1))));
         rightRear.setTargetPosition((p4 + (Rotations * (forward ? 1 : -1))));
-        
-        /*
-        
-        double vertex = 1/3; 
-        double sharpness=1;
-        double K=Math.abs((Targetpow-0.05)/Math.pow((1-vertex)*Rotations,sharpness));
-        */
-        double minPower = 0.25;
-        double steepness = 1;
-        
-        double startAngle = imu.getAngularOrientation().firstAngle;
-        
-        while(leftFront.isBusy() && rightFront.isBusy() && leftRear.isBusy() && rightRear.isBusy()){
-            double currPos=Math.abs(rightFront.getCurrentPosition()-p2);
-            /*
-            double pow=Targetpow-K*Math.abs(Math.pow(currPos-Rotations*vertex,sharpness));
-            */
-            double pow = Targetpow-(1 - minPower)*(Targetpow*Math.pow((1-((2*currPos)/Rotations)),2*steepness));
-            
-            double gain = pow/15;
-        
-
-            leftFront.setPower(pow);
-            rightFront.setPower(pow);
-            leftRear.setPower(pow);
-            rightRear.setPower(pow);
-            
-            //double currentAngle = imu.getAngularOrientation().firstAngle;
-
-
-            //double turnPow =  pow <= .44 ? .2 : pow/4.4;
-
-            /*
-            while (Math.abs(startAngle-currentAngle) > 1 && opModeIsActive()){
-
-                
-            
-
-                
-
-                double correction = startAngle-currentAngle;
-             
-
-          
-                leftFront.setPower(pow + ((correction < 0) ? gain : 0));
-                rightFront.setPower(pow + ((correction < 0) ? 0: gain));
-                leftRear.setPower(pow + ((correction < 0) ? gain : 0));
-                rightRear.setPower(pow + ((correction < 0) ? 0 : gain));
-
-                telemetry.addData("Current Angle", currentAngle);
-                telemetry.addData("Angle Delate", startAngle - currentAngle);
-                telemetry.addData("Gain", Double.toString(gain));
-                telemetry.update();
-            
-            }
-            */
-            
-
-
-
-
-            
-            telemetry.addData("POWER", Double.toString(pow));
-            telemetry.update();
-        }
+        leftFront.setPower(pow);
+        rightFront.setPower(pow);
+        leftRear.setPower(pow);
+        rightRear.setPower(pow);
+        while(leftFront.isBusy() && rightFront.isBusy() && leftRear.isBusy() && rightRear.isBusy()){idle();}
         stop(0);
-        sleep(50);
     }
-    
     //0-radius rotation, (speed, milliseconds running)
     //positive power turns right, negative power turns left
-    public void rotate(int Rotations, double p, boolean right){
+    public void rotate(int Rotations, double pow, boolean right){
         int p1 = leftFront.getTargetPosition();
         int p2 = rightFront.getTargetPosition();
         int p3 = leftRear.getTargetPosition();
@@ -164,17 +97,12 @@ public class BlueAllianceAuto2023 extends LinearOpMode {
         rightFront.setTargetPosition(p2 + Rotations * (!right ? -1 : 1));
         leftRear.setTargetPosition(p3 + Rotations * (right ? -1 : 1));
         rightRear.setTargetPosition(p4 + Rotations * (!right ? -1 : 1));
-        leftFront.setPower(p);
-        rightFront.setPower(p);
-        leftRear.setPower(p);
-        rightRear.setPower(p);
-        
-        while(leftFront.isBusy() && rightFront.isBusy() && leftRear.isBusy() && rightRear.isBusy()){
-            idle();
-        }
-        
+        leftFront.setPower(pow);
+        rightFront.setPower(pow);
+        leftRear.setPower(pow);
+        rightRear.setPower(pow);
+        while(leftFront.isBusy() && rightFront.isBusy() && leftRear.isBusy() && rightRear.isBusy()){idle();}
         stop(0);
-        sleep(50);
     }
     public boolean strafe(int Rotations, double p, boolean right){
         int p1 = leftFront.getTargetPosition();
@@ -217,16 +145,16 @@ public class BlueAllianceAuto2023 extends LinearOpMode {
 
 
     public static void openGrip(Servo gripLeft, Servo gripRight){
-        gripLeft.setPosition(.4);
-        gripRight.setPosition(.4);
+        gripLeft.setPosition(.6);
+        gripRight.setPosition(.6);
     }
 
     public void closeGrip(Servo gripLeft, Servo gripRight){
-        gripLeft.setPosition(.26);
-        gripRight.setPosition(.26);
+        gripLeft.setPosition(.28);
+        gripRight.setPosition(.28);
     }
     
-    public void degreesRotate(double degrees, double p) {
+    public void accurateRotate(double degrees, double p) {
 
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -235,40 +163,29 @@ public class BlueAllianceAuto2023 extends LinearOpMode {
 
         double currentAngle = imu.getAngularOrientation().firstAngle;
         telemetry.addData("Starting Angle", currentAngle);
-        
-        while (currentAngle > degrees + 1 || currentAngle < degrees-1) {
+        while (!(currentAngle <= degrees + p*2 && currentAngle >= degrees-p*2)) {
             currentAngle = imu.getAngularOrientation().firstAngle;
-            
-            leftFront.setPower((degrees < 0) ? -p : p);
-            rightFront.setPower((degrees < 0) ? p : -p);
-            leftRear.setPower((degrees < 0) ? -p : p);
-            rightRear.setPower((degrees < 0) ? p : -p);
-            
             telemetry.addData("Current Angle", currentAngle);
             telemetry.update();
+            leftFront.setPower((degrees < 1) ? -p : p);
+            rightFront.setPower((degrees < 1) ? p : -p);
+            leftRear.setPower((degrees < 1) ? -p : p);
+            rightRear.setPower((degrees < 1) ? p : -p);
         }
-        
-        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        
-        stop(0);
+
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-    
-    SleeveDetection sleeveDetection; 
-    OpenCvCamera camera;
-    
-    // Name of the Webcam to be set in the config
-    String webcamName = "Webcam 1";
 
 
 
     @Override public void runOpMode() throws InterruptedException {
         
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
 
 
@@ -283,19 +200,17 @@ public class BlueAllianceAuto2023 extends LinearOpMode {
         gripLeft = hardwareMap.get(Servo.class, "gripLeft");
         gripRight = hardwareMap.get(Servo.class, "gripRight");
         gripRight.setDirection(Servo.Direction.REVERSE);
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        rightFront.setDirection(DcMotor.Direction.FORWARD);
-        leftRear.setDirection(DcMotor.Direction.REVERSE);
-        rightRear.setDirection(DcMotor.Direction.FORWARD);
-        
+        leftFront.setDirection(DcMotor.Direction.FORWARD);
+        rightFront.setDirection(DcMotor.Direction.REVERSE);
+        leftRear.setDirection(DcMotor.Direction.FORWARD);
+        rightRear.setDirection(DcMotor.Direction.REVERSE);
         carousel.setDirection(DcMotor.Direction.REVERSE);
         carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         carousel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        carousel.setPower(1);
+        carousel.setPower(.5);
         carousel.setTargetPosition(0);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         carousel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFront.setTargetPosition(0);
@@ -307,7 +222,6 @@ public class BlueAllianceAuto2023 extends LinearOpMode {
         rightFront.setTargetPosition(0);
         rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
 
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -321,54 +235,76 @@ public class BlueAllianceAuto2023 extends LinearOpMode {
         rightRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
+
         closeGrip(gripLeft, gripRight);
         sleep(200);
         carousel.setTargetPosition(100);
-        
+        //End of assigning configurations 
+
 
         waitForStart();
         opModeIsActive();
         
-        //End of assigning configurations 
-        
         //Beginning of Autonomus instructions
+        
+        //carousel.setTargetPosition(750);
+        
+        while(carousel.isBusy()){idle();}
+        
+        //strafe(25, .4, true);
+        
+        
+        //place robot at 8.2in from inner side of square
+        
+        /*
+        
+        Working auton
+        
+        forward(1209, .2, true);
+        carousel.setTargetPosition(1100);
+        rotate(349, .2, false);
 
-        openGrip(gripLeft, gripRight);
-        closeGrip(gripLeft, gripRight);
-        openGrip(gripLeft, gripRight);
-        closeGrip(gripLeft, gripRight);
-        openGrip(gripLeft, gripRight);
+        sleep(300);
+        rotate(224, .2, false);
+        sleep(300);
+        */
         
-        strafe(80,.8,true);
-        stop(800);
-        forward(1230,.3,true);
-        sleep(500);
-        rotate(300,.45,true);
-        forward(140,.25,true);
-        sleep(250);
-        carousel.setTargetPosition(2920);
+        
+        
+        //while(carousel.isBusy()){idle();}
+        
+        //forward and rotate switch ahhhhhhhhhhhhhhhhh
+        
+        
+        forward(1465, .3, true);
+        
+        
+        
+        /*
+        carousel.setTargetPosition(1100);
         while(carousel.isBusy()){idle();}
-        forward(85, .35, true);
-        sleep(500);
+        forward(235, .1, true);
         openGrip(gripLeft, gripRight);
-        forward(85, .25, false);
-        carousel.setTargetPosition(100);
-        while(carousel.isBusy()){idle();}
-        
-        
-        
-        forward(95, .45, false);
+        forward(300, .2, false);
+        sleep(150);
+        carousel.setTargetPosition(390);
+        //while(carousel.isBusy()){idle();}
+        //strafe(0, 0.0, true);
+        strafe(255, .3, false);
+        sleep(100);
+        rotate(1155, .5, true);
         sleep(200);
-        rotate(300, .45, false);
-        forward(150, .2, false);
-        rotate(575, .45, false);
+        //forward(1, 0.0001, true);
+        forward(650, .3, true);
+        closeGrip(gripLeft, gripRight);
+        */
         
+        //535 is  a 90 degee rotation
+        
+        
+    
 
-        
-        
-
-        
-        //carousel.setTargetPosition(0);
+ 
         //End of Autonomus
         
         
