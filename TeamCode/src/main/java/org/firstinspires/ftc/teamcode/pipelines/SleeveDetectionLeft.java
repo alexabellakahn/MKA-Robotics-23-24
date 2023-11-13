@@ -15,7 +15,11 @@ public class SleeveDetectionLeft extends OpenCvPipeline {
     // Color definitions (R, G, B)
     private final Scalar RED = new Scalar(255, 0, 0);
     private final Scalar BLUE = new Scalar(0, 0, 255);
-    private final Scalar MAGENTA = new Scalar(0, 0, 0);
+    private final Scalar GREEN = new Scalar(0, 255, 0);
+
+    private String position = "right";
+
+    private int minC = 0; //Min amount of green allowed
 
     private Telemetry telemetry = null;
 
@@ -51,6 +55,10 @@ public class SleeveDetectionLeft extends OpenCvPipeline {
         this.telemetry = telemetry;
     }
 
+    public String getPosition(){
+        return position;
+    }
+
     private static Scalar process(Mat input, Rect targetRect){
         Mat areaMat = input.submat(targetRect);
         Scalar sumColors = Core.sumElems(areaMat);
@@ -66,9 +74,18 @@ public class SleeveDetectionLeft extends OpenCvPipeline {
         Scalar leftColors = process(input, leftRect);
         Scalar midColors = process(input, midRect);
 
-        telemetry.addData("LEFT",leftColors.val[0]);
-        telemetry.addData("sumColors 1", midColors.val[1]);
-        telemetry.addData("MID", midColors.val[0]);
+        if(leftColors.val[1] > midColors.val[0] && leftColors.val[0] > minC)
+            position = "left";
+        if(leftColors.val[1] < midColors.val[0] && midColors.val[0] > minC)
+            position = "mid";
+        else{
+            position = "right";
+        }
+
+
+
+        telemetry.addData("leftGreen",leftColors.val[1]);
+        telemetry.addData("midGreen", midColors.val[1]);
         telemetry.update();
 
         Imgproc.rectangle(
