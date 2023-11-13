@@ -39,6 +39,8 @@ public class TestTeleOp2023A extends LinearOpMode {
     private Servo gripRight = null;
     private BNO055IMU imu = null;
 
+    private Servo lift = null;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized", "haggis");
@@ -66,10 +68,10 @@ public class TestTeleOp2023A extends LinearOpMode {
         imu.initialize(parameters);
        
         //revArm = hardwareMap.get(DcMotor.class, "revArm");
-        //lift = hardwareMap.get(DcMotor.class, "lift");
+        lift = hardwareMap.get(Servo.class, "lift");
        
-        gripLeft = hardwareMap.get(Servo.class, "gripLeft");
-        gripRight = hardwareMap.get(Servo.class, "gripRight");
+        gripLeft = hardwareMap.get(Servo.class, "leftGrip");
+        gripRight = hardwareMap.get(Servo.class, "rightGrip");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
