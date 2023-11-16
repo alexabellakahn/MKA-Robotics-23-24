@@ -11,7 +11,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 //keep
 public class SleeveDetectionLeft extends OpenCvPipeline {
-    
+
     // Color definitions (R, G, B)
     private final Scalar RED = new Scalar(255, 0, 0);
     private final Scalar BLUE = new Scalar(0, 0, 255);
@@ -67,9 +67,21 @@ public class SleeveDetectionLeft extends OpenCvPipeline {
 
         return sumColors;
     }
+    private Mat ycrcbMat       = new Mat();
+    private Mat binaryMat      = new Mat();
+    private Mat maskedInputMat = new Mat();
+    public Scalar lower = new Scalar(0, 0, 0);
+    public Scalar upper = new Scalar(255, 255, 255);
+
+    public SimpleThresholdProcessor.ColorSpace colorSpace = SimpleThresholdProcessor.ColorSpace.RGB;
 
     @Override
     public Mat processFrame(Mat input) {
+        Imgproc.cvtColor(input, ycrcbMat, colorSpace.cvtCode);
+        Core.inRange(ycrcbMat, lower, upper, binaryMat);
+        maskedInputMat.release();
+        Core.bitwise_and(input, input, maskedInputMat, binaryMat);
+        maskedInputMat.copyTo(input);
 
         Scalar leftColors = process(input, leftRect);
         Scalar midColors = process(input, midRect);
