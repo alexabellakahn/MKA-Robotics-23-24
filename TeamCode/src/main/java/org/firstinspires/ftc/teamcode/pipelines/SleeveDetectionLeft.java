@@ -82,6 +82,8 @@ public class SleeveDetectionLeft extends OpenCvPipeline {
         maskedInputMat.release();
         Core.bitwise_and(input, input, maskedInputMat, binaryMat);
         maskedInputMat.copyTo(input);
+        binaryMat.release();
+        ycrcbMat.release();
 
         Scalar leftColors = process(input, leftRect);
         Scalar midColors = process(input, midRect);
