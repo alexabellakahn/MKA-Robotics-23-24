@@ -8,6 +8,10 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
+import org.opencv.core.MatOfPoint;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //keep
 public class SleeveDetectionLeft extends OpenCvPipeline {
@@ -84,6 +88,7 @@ public class SleeveDetectionLeft extends OpenCvPipeline {
         maskedInputMat.copyTo(input);
         binaryMat.release();
         ycrcbMat.release();
+
 
         Scalar leftColors = process(input, leftRect);
         Scalar midColors = process(input, midRect);
