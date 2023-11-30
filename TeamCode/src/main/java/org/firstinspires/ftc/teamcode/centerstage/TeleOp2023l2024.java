@@ -24,6 +24,7 @@ public class TeleOp2023l2024 extends LinearOpMode {
 
     private Servo plane = null;
     private DcMotor carousel = null;
+    private DcMotor winch = null;
     private Servo lift = null;
     private Servo rightGrip = null;
     private Servo leftGrip = null;
@@ -112,6 +113,8 @@ public class TeleOp2023l2024 extends LinearOpMode {
 
 
 
+
+
     public void launchPlane(){
     plane.setPosition(1);// need to test
     }
@@ -134,7 +137,11 @@ public class TeleOp2023l2024 extends LinearOpMode {
         leftGrip = hardwareMap.get(Servo.class, "leftGrip");
         plane = hardwareMap.get(Servo.class, "plane");
         carousel = hardwareMap.get(DcMotor.class, "carousel");
+        winch = hardwareMap.get(DcMotor.class, "winch");
 
+        winch.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        winch.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        winch.setDirection(DcMotor.Direction.REVERSE);
 
         carousel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         carousel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -238,6 +245,14 @@ public class TeleOp2023l2024 extends LinearOpMode {
             else if (gamepad1.dpad_down) {
                 closeGrip();
                 down();
+            }
+
+            if (gamepad1.left_bumper) {
+                winch.setPower(1);
+            } else if (gamepad1.right_bumper) {
+                winch.setPower(-1);
+            } else {
+                winch.setPower(0);
             }
 
             if (gamepad1.left_trigger > 0) {
