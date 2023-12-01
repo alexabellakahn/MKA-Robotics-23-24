@@ -4,9 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 
 @TeleOp(name = "MAIN", group = "Linear Opmode")
@@ -28,6 +31,10 @@ public class TeleOp2023l2024 extends LinearOpMode {
     private Servo lift = null;
     private Servo rightGrip = null;
     private Servo leftGrip = null;
+
+    private DcMotor leftEncoder = null;
+    private DcMotor rightEncoder = null;
+    private DcMotor middleEncoder = null;
 
     public void movement() {
         double Lpower = 0.58;
@@ -137,11 +144,18 @@ public class TeleOp2023l2024 extends LinearOpMode {
         leftGrip = hardwareMap.get(Servo.class, "leftGrip");
         plane = hardwareMap.get(Servo.class, "plane");
         carousel = hardwareMap.get(DcMotor.class, "carousel");
-        winch = hardwareMap.get(DcMotor.class, "winch");
 
-        winch.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        winch.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        winch.setDirection(DcMotor.Direction.REVERSE);
+
+        leftEncoder = hardwareMap.get(DcMotor.class, "leftEncoder");
+        rightEncoder = hardwareMap.get(DcMotor.class, "rightEncoder");
+        middleEncoder  = hardwareMap.get(DcMotor.class, "middleEncoder");
+
+        rightEncoder.setDirection(DcMotor.Direction.REVERSE);
+        middleEncoder.setDirection(DcMotor.Direction.REVERSE);
+
+        leftEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        middleEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         carousel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         carousel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -246,7 +260,7 @@ public class TeleOp2023l2024 extends LinearOpMode {
                 closeGrip();
                 down();
             }
-
+            /*
             if (gamepad1.left_bumper) {
                 winch.setPower(1);
             } else if (gamepad1.right_bumper) {
@@ -254,6 +268,8 @@ public class TeleOp2023l2024 extends LinearOpMode {
             } else {
                 winch.setPower(0);
             }
+            */
+
 
             if (gamepad1.left_trigger > 0) {
                 slideDown();
@@ -271,6 +287,10 @@ public class TeleOp2023l2024 extends LinearOpMode {
             telemetry.addData("RT", gamepad1.left_trigger);
             telemetry.addData("liftToggle", liftToggle);
             telemetry.addData("gripToggle", gripToggle);
+            telemetry.addData("LiftD", lift.getDirection());
+            telemetry.addData("leftEncoder", leftEncoder.getCurrentPosition());
+            telemetry.addData("rightEncoder", rightEncoder.getCurrentPosition());
+            telemetry.addData("middleEncoder", middleEncoder.getCurrentPosition());
             telemetry.update();
         }
     }
