@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -32,9 +33,9 @@ public class TeleOp2023l2024 extends LinearOpMode {
     private Servo rightGrip = null;
     private Servo leftGrip = null;
 
-    private DcMotor leftEncoder = null;
-    private DcMotor rightEncoder = null;
-    private DcMotor middleEncoder = null;
+    private Encoder leftEncoder = null;
+    private Encoder rightEncoder = null;
+    private Encoder frontEncoder = null;
 
     public void movement() {
         double Lpower = 0.58;
@@ -146,16 +147,14 @@ public class TeleOp2023l2024 extends LinearOpMode {
         carousel = hardwareMap.get(DcMotor.class, "carousel");
 
 
-        leftEncoder = hardwareMap.get(DcMotor.class, "leftEncoder");
-        rightEncoder = hardwareMap.get(DcMotor.class, "rightEncoder");
-        middleEncoder  = hardwareMap.get(DcMotor.class, "middleEncoder");
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftEncoder"));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightEncoder"));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frontEncoder"));
 
-        rightEncoder.setDirection(DcMotor.Direction.REVERSE);
-        middleEncoder.setDirection(DcMotor.Direction.REVERSE);
+        rightEncoder.setDirection(Encoder.Direction.REVERSE);
+        frontEncoder.setDirection(Encoder.Direction.REVERSE);
 
-        leftEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        middleEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
         carousel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         carousel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -290,7 +289,7 @@ public class TeleOp2023l2024 extends LinearOpMode {
             telemetry.addData("LiftD", lift.getDirection());
             telemetry.addData("leftEncoder", leftEncoder.getCurrentPosition());
             telemetry.addData("rightEncoder", rightEncoder.getCurrentPosition());
-            telemetry.addData("middleEncoder", middleEncoder.getCurrentPosition());
+            telemetry.addData("middleEncoder", frontEncoder.getCurrentPosition());
             telemetry.update();
         }
     }
