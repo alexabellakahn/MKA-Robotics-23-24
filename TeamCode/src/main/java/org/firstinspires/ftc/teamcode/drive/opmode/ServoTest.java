@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
@@ -15,30 +16,35 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
 @TeleOp(group = "drive")
-public class LocalizationTest extends LinearOpMode {
+public class ServoTest extends LinearOpMode {
+    private Servo plane = null;
+
     @Override
     public void runOpMode() throws InterruptedException {
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        plane = hardwareMap.get(Servo.class, "plane");
+        plane.setDirection(Servo.Direction.REVERSE);
 
         waitForStart();
 
+        double pos = 0;
+        double step = 0.001;
+
         while (!isStopRequested()) {
-            drive.setWeightedDrivePower(
-                    new Pose2d(
-                            -gamepad1.left_stick_y,
-                            -gamepad1.left_stick_x,
-                            -gamepad1.right_stick_x
-                    )
-            );
+            if (gamepad1.left_bumper) {
+                while (gamepad1.left_bumper && pos > 0.0) {
+                    pos -= step;
+                    plane.setPosition(pos);
+                }
+            }
+            else if (gamepad1.right_bumper) {
+                while (gamepad1.right_bumper && pos < 1.0) {
+                    pos += step;
+                    plane.setPosition(pos);
+                }
+            }
 
-            drive.update();
-
-            Pose2d poseEstimate = drive.getPoseEstimate();
-            telemetry.addData("x", poseEstimate.getX());
-            telemetry.addData("y", poseEstimate.getY());
-            telemetry.addData("heading", poseEstimate.getHeading());
+            telemetry.addData("Servo Position", plane.getPosition());
             telemetry.update();
         }
     }
