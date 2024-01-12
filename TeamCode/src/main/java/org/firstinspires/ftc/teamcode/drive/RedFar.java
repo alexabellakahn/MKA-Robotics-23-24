@@ -18,6 +18,7 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
+//import com.google.ar.core.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -103,30 +104,39 @@ public class RedFar extends LinearOpMode {
 
         //carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        drive.setPoseEstimate(new Pose2d());
+
         Trajectory traj1 = drive.trajectoryBuilder(new Pose2d())
                 .forward(27)
                 .build();
 
-        Trajectory traj2 = drive.trajectoryBuilder(new Pose2d())
-
-                .splineTo(new Vector2d(-10, 40), -90)
-                /*
-                .splineTo(new Vector2d(0, 0), -90)
-                .splineTo(new Vector2d(0, 0), 90)
-                .addDisplacementMarker(() -> {
-                    carousel.setTargetPosition(0);
-                })
-                .splineTo(new Vector2d(0, 0), -90)
-                */
-
+        Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
+                .forward(10)
                 .build();
+
+        Trajectory traj3 = drive.trajectoryBuilder(traj2.end())
+                .back(10)
+                .build();
+
+        Trajectory traj4 = drive.trajectoryBuilder(traj3.end())
+                .forward(30)
+                .build();
+
+
 
         waitForStart();
 
         if(isStopRequested()) return;
 
         drive.followTrajectory(traj1);
+        drive.turn(Math.toRadians(-90)); // depending on case using opencv
         drive.followTrajectory(traj2);
+        sleep(300);
+        drive.followTrajectory(traj3);
+        drive.turn(Math.toRadians(0)); // depending on case using opencv
+        drive.followTrajectory(traj4);
+        drive.turn(Math.toRadians(-90));
+
 
     }
 }

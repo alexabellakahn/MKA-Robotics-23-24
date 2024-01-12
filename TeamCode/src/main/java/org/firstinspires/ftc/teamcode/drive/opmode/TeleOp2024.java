@@ -96,7 +96,7 @@ public class TeleOp2024 extends LinearOpMode {
     }
 
     public void down() {
-        lift.setPosition(.64);
+        lift.setPosition(.7);
         liftToggle = false;
     }
 
@@ -181,7 +181,7 @@ public class TeleOp2024 extends LinearOpMode {
 
         leftGrip.setPosition(.38);
         rightGrip.setPosition(.81);
-        lift.setPosition(.64);
+        lift.setPosition(.7);
 
         runtime.reset();
 
