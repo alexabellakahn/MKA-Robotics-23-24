@@ -21,6 +21,7 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityCons
 //import com.google.ar.core.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -54,7 +55,7 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 
-@TeleOp(name = "RedFar", group = "Linear Opmode")
+@Autonomous(name = "RedFar", group = "Linear Opmode")
 public class RedFar extends LinearOpMode {
     private DcMotorEx carousel;
     private Servo lift, leftGrip, rightGrip;
@@ -110,7 +111,8 @@ public class RedFar extends LinearOpMode {
                 .forward(27)
                 .build();
 
-        Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
+
+        Trajectory traj2 = drive.trajectoryBuilder(traj1.end().plus(new Pose2d(0, 0, Math.toRadians(-90))))
                 .forward(10)
                 .build();
 
@@ -118,7 +120,7 @@ public class RedFar extends LinearOpMode {
                 .back(10)
                 .build();
 
-        Trajectory traj4 = drive.trajectoryBuilder(traj3.end())
+        Trajectory traj4 = drive.trajectoryBuilder(traj3.end().plus(new Pose2d(0, 0, Math.toRadians(90))))
                 .forward(30)
                 .build();
 
@@ -133,7 +135,7 @@ public class RedFar extends LinearOpMode {
         drive.followTrajectory(traj2);
         sleep(300);
         drive.followTrajectory(traj3);
-        drive.turn(Math.toRadians(0)); // depending on case using opencv
+        drive.turn(Math.toRadians(90)); // depending on case using opencv
         drive.followTrajectory(traj4);
         drive.turn(Math.toRadians(-90));
 
