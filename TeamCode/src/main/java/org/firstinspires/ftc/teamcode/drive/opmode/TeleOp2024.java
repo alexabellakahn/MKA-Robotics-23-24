@@ -100,7 +100,7 @@ public class TeleOp2024 extends LinearOpMode {
         liftToggle = false;
     }
 
-    public void side() {
+    public void middle() {
         lift.setPosition(.84);
         liftToggle = true;
     }
@@ -125,13 +125,13 @@ public class TeleOp2024 extends LinearOpMode {
 
     public void launchPlane(){
 
-        plane.setPosition(0.325);
+        plane.setPosition(0.3);
 
         //plane.setPosition(0.20);
         sleep(800);
 
+        plane.setPosition(.675);
 
-        plane.setPosition(0);
 
     }
 
@@ -174,6 +174,7 @@ public class TeleOp2024 extends LinearOpMode {
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         leftRear.setDirection(DcMotor.Direction.FORWARD);
         rightRear.setDirection(DcMotor.Direction.REVERSE);
+
 
 
         // Wait for the game to start (driver presses PLAY)
