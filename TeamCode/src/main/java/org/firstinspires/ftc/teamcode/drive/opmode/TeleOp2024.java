@@ -18,6 +18,7 @@ public class TeleOp2024 extends LinearOpMode {
 
     boolean liftToggle = false;
     boolean gripToggle = false;
+    boolean slideActive = false;
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFront = null;
@@ -105,18 +106,13 @@ public class TeleOp2024 extends LinearOpMode {
         liftToggle = true;
     }
 
-    public void slideUp() {
-        while (gamepad1.right_trigger != 0) {
-            carousel.setPower(-gamepad1.right_trigger);
-        }
-        carousel.setPower(0);
-    }
-
-    public void slideDown() {
-        while (gamepad1.left_trigger != 0) {
+    public void liftSlide() {
+        if (gamepad1.left_trigger != 0) {
             carousel.setPower(gamepad1.left_trigger);
         }
-        carousel.setPower(0);
+        else if (gamepad1.right_trigger != 0) {
+            carousel.setPower(-gamepad1.right_trigger);
+        }
     }
 
 
@@ -280,10 +276,8 @@ public class TeleOp2024 extends LinearOpMode {
             */
 
 
-            if (gamepad1.left_trigger > 0) {
-                slideDown();
-            }
-            else if (gamepad1.right_trigger > 0) slideUp();
+            if (gamepad1.left_trigger != 0 || gamepad1.right_trigger != 0) {liftSlide();}
+            else {carousel.setPower(0);}
 
 
 
