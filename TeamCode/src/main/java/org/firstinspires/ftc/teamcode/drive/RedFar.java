@@ -124,6 +124,15 @@ public class RedFar extends LinearOpMode {
                 .forward(30)
                 .build();
 
+        Trajectory traj5 = drive.trajectoryBuilder(traj4.end().plus(new Pose2d(0, 0, Math.toRadians(-90))))
+                .forward(70)
+                .build();
+
+        Trajectory traj6 = drive.trajectoryBuilder(traj4.end().plus(new Pose2d(0, 0, Math.toRadians(180))))
+                .strafeLeft(30)
+                .build();
+
+
 
 
         waitForStart();
@@ -138,6 +147,9 @@ public class RedFar extends LinearOpMode {
         drive.turn(Math.toRadians(90)); // depending on case using opencv
         drive.followTrajectory(traj4);
         drive.turn(Math.toRadians(-90));
+        drive.followTrajectory(traj5);
+        drive.turn(Math.toRadians(180));
+        drive.followTrajectory(traj6);
 
 
     }

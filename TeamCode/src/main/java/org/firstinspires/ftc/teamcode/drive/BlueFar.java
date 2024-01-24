@@ -91,7 +91,7 @@ public class BlueFar extends LinearOpMode {
             if (Math.abs(carousel.getCurrentPosition() - targetpos) < 50) {
                 break;
             }
-        }
+        };
         carousel.setPower(0);
     }
 
@@ -105,12 +105,61 @@ public class BlueFar extends LinearOpMode {
 
         //carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+
         drive.setPoseEstimate(new Pose2d());
+
+        Trajectory traj1 = drive.trajectoryBuilder(new Pose2d())
+                .forward(27)
+                .build();
+
+
+        Trajectory traj2 = drive.trajectoryBuilder(traj1.end().plus(new Pose2d(0, 0, Math.toRadians(90))))
+                .forward(10)
+                .build();
+
+        Trajectory traj3 = drive.trajectoryBuilder(traj2.end())
+                .back(10)
+                .build();
+
+        Trajectory traj4 = drive.trajectoryBuilder(traj3.end().plus(new Pose2d(0, 0, Math.toRadians(-90))))
+                .forward(30)
+                .build();
+
+        Trajectory traj5 = drive.trajectoryBuilder(traj4.end().plus(new Pose2d(0, 0, Math.toRadians(90))))
+                .forward(80)
+                .build();
+
+        Trajectory traj6 = drive.trajectoryBuilder(traj5.end())
+                .strafeLeft(35)
+                .build();
+
+        Trajectory traj7 = drive.trajectoryBuilder(traj6.end().plus(new Pose2d(0, 0, Math.toRadians(180))))
+                .back(8)
+                .build();
+
+
+
 
 
         waitForStart();
 
         if(isStopRequested()) return;
+
+        drive.followTrajectory(traj1);
+        drive.turn(Math.toRadians(90)); // depending on case using opencv
+        drive.followTrajectory(traj2);
+        sleep(300);
+        drive.followTrajectory(traj3);
+        drive.turn(Math.toRadians(-90)); // depending on case using opencv
+        drive.followTrajectory(traj4);
+        drive.turn(Math.toRadians(90));
+        drive.followTrajectory(traj5);
+        drive.followTrajectory(traj6);
+        drive.turn(Math.toRadians(180));
+        drive.followTrajectory(traj7);
+
+
+
 
     }
 }
