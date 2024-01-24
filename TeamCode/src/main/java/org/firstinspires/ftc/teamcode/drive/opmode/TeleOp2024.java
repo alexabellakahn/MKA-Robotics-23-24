@@ -279,9 +279,17 @@ public class TeleOp2024 extends LinearOpMode {
             if (gamepad1.left_trigger != 0 || gamepad1.right_trigger != 0) {liftSlide();}
             else {carousel.setPower(0);}
 
+            if (carousel.getCurrentPosition() > -4200) {
+                down();
+                if (carousel.getPower() > 0) {
+                    closeGrip();
+                }
+            }
 
 
-            telemetry.addData("Power", carousel.getPower());
+
+            telemetry.addData("Slide Power", carousel.getPower());
+            telemetry.addData("Slide Position", carousel.getCurrentPosition());
             telemetry.addData("RIGHT", rightGrip.getPosition());
             telemetry.addData("LEFT", leftGrip.getPosition());
             telemetry.addData("RightD", rightGrip.getDirection());
