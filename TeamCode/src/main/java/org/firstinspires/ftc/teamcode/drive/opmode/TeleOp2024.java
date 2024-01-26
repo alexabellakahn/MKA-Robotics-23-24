@@ -1,15 +1,18 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
 
@@ -18,7 +21,9 @@ public class TeleOp2024 extends LinearOpMode {
 
     boolean liftToggle = false;
     boolean gripToggle = false;
-    boolean slideActive = false;
+
+    int liftUpPos = 1700;
+    boolean isCalibrated = false;
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFront = null;
@@ -33,6 +38,8 @@ public class TeleOp2024 extends LinearOpMode {
     private Servo lift = null;
     private Servo rightGrip = null;
     private Servo leftGrip = null;
+
+    private DistanceSensor distanceSensor = null;
 
     private Encoder leftEncoder = null;
     private Encoder rightEncoder = null;
@@ -80,7 +87,7 @@ public class TeleOp2024 extends LinearOpMode {
     }
 
     public void closeGrip() { //close grabber
-        leftGrip.setPosition(.25);
+        leftGrip.setPosition(.29); // .25
         rightGrip.setPosition(.91);
         gripToggle = true;
     }
@@ -97,7 +104,7 @@ public class TeleOp2024 extends LinearOpMode {
     }
 
     public void down() {
-        lift.setPosition(.7);
+        lift.setPosition(.715);
         liftToggle = false;
     }
 
@@ -155,6 +162,8 @@ public class TeleOp2024 extends LinearOpMode {
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightEncoder"));
         frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frontEncoder"));
 
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+
         rightEncoder.setDirection(Encoder.Direction.REVERSE);
         frontEncoder.setDirection(Encoder.Direction.REVERSE);
 
@@ -178,7 +187,7 @@ public class TeleOp2024 extends LinearOpMode {
 
         leftGrip.setPosition(.38);
         rightGrip.setPosition(.81);
-        lift.setPosition(.7);
+        lift.setPosition(.713);
 
         runtime.reset();
 
@@ -279,15 +288,23 @@ public class TeleOp2024 extends LinearOpMode {
             if (gamepad1.left_trigger != 0 || gamepad1.right_trigger != 0) {liftSlide();}
             else {carousel.setPower(0);}
 
-            if (carousel.getCurrentPosition() > -4200) {
+            if (carousel.getCurrentPosition() > liftUpPos) {
                 down();
                 if (carousel.getPower() > 0) {
                     closeGrip();
                 }
             }
 
+            if (gamepad1.left_stick_button && gamepad1.right_stick_button) {
+                liftUpPos = carousel.getCurrentPosition();
+                isCalibrated = true;
+            }
 
 
+
+            telemetry.addData("Calibrated", isCalibrated);
+            if (isCalibrated) {telemetry.addData("Calibrated liftUpPos", liftUpPos
+            );}
             telemetry.addData("Slide Power", carousel.getPower());
             telemetry.addData("Slide Position", carousel.getCurrentPosition());
             telemetry.addData("RIGHT", rightGrip.getPosition());
@@ -304,6 +321,7 @@ public class TeleOp2024 extends LinearOpMode {
             telemetry.addData("leftEncoder", leftEncoder.getCurrentPosition());
             telemetry.addData("rightEncoder", rightEncoder.getCurrentPosition());
             telemetry.addData("middleEncoder", frontEncoder.getCurrentPosition());
+            telemetry.addData("distanceSensor", distanceSensor.getDistance(DistanceUnit.INCH));
             telemetry.update();
         }
     }
