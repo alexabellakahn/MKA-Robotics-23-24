@@ -57,6 +57,11 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 
+//camera imports
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+
 @Autonomous(name = "BlueClose", group = "Linear Opmode")
 public class BlueClose extends LinearOpMode {
     private DcMotorEx carousel;
@@ -65,7 +70,9 @@ public class BlueClose extends LinearOpMode {
     boolean gripToggle = false;
     private DistanceSensor distanceSensor;
 
-    int objectPosition = 0; // 0: left, 1: middle, 2: right
+    OpenCvCamera camera; // initialize camera var
+
+    int objectPosition = 2; // 0: left, 1: middle, 2: right (to be implemented)
 
     public void closeGrip() { //close grabber
         leftGrip.setPosition(.25);
@@ -100,11 +107,23 @@ public class BlueClose extends LinearOpMode {
         carousel.setPower(0);
     }
 
+    // Name of the Webcam to be set in the config
+    String webcamName = "Webcam 1";
+    SleeveDetectionLeft sleeveDetection;
+
     @Override
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         lift = hardwareMap.get(Servo.class, "lift");
         rightGrip = hardwareMap.get(Servo.class, "rightGrip");
+
+        //camera stuff
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
+        sleeveDetection = new SleeveDetectionLeft(telemetry);
+
+        camera.setPipeline(sleeveDetection);
+
         leftGrip = hardwareMap.get(Servo.class, "leftGrip");
         carousel = hardwareMap.get(DcMotorEx.class, "carousel");
 
