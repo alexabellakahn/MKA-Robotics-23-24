@@ -26,6 +26,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -34,6 +35,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
@@ -55,39 +57,65 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 
-//camera imports
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-
 @Autonomous(name = "RedClose", group = "Linear Opmode")
 public class RedClose extends LinearOpMode {
     private DcMotorEx carousel;
     private Servo lift, leftGrip, rightGrip;
+    private DistanceSensor distanceSensor;
+
     boolean liftToggle = false;
     boolean gripToggle = false;
 
-    OpenCvCamera camera;
+    int objectPosition = 0; // 0: left, 1: middle, 2: right
+
+
+
 
     public void closeGrip() { //close grabber
-        leftGrip.setPosition(.25);
+        leftGrip.setPosition(.2825); // .25
         rightGrip.setPosition(.91);
         gripToggle = true;
     }
 
-    public void openGrip() { //open grabber
+    private void openGrip2() { //drop outer pixel
+        leftGrip.setPosition(.365); // .25
+        rightGrip.setPosition(.91);
+        gripToggle = true;
+    }
+
+
+    public void openGrip1() { //open grabber
         leftGrip.setPosition(.48); //need to test
         rightGrip.setPosition(.76);
         gripToggle = false;
     }
 
+    public void dropPixel(int pixelNumber) {
+        switch (pixelNumber) {
+            case 0:
+                openGrip2();
+                sleep(150);
+                closeGrip();
+                break;
+            case 1:
+                up();
+                sleep(500);
+                openGrip1();
+                sleep(500);
+                closeGrip();
+                down();
+                break;
+
+        }
+    }
+
     public void up() {
-        lift.setPosition(1);
+        lift.setPosition(.715);
         liftToggle = true;
     }
 
     public void down() {
-        lift.setPosition(.64);
+        lift.setPosition(.6775);
         liftToggle = false;
     }
 
@@ -98,45 +126,262 @@ public class RedClose extends LinearOpMode {
             if (Math.abs(carousel.getCurrentPosition() - targetpos) < 50) {
                 break;
             }
-        }
+        };
         carousel.setPower(0);
     }
-
-    // Name of the Webcam to be set in the config
-    String webcamName = "Webcam 1";
-    SleeveDetectionLeft sleeveDetection;
 
     @Override
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         lift = hardwareMap.get(Servo.class, "lift");
         rightGrip = hardwareMap.get(Servo.class, "rightGrip");
-
-        //camera stuff
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
-        sleeveDetection = new SleeveDetectionLeft(telemetry);
-
-        camera.setPipeline(sleeveDetection);
-
         leftGrip = hardwareMap.get(Servo.class, "leftGrip");
         carousel = hardwareMap.get(DcMotorEx.class, "carousel");
+        carousel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        carousel.setTargetPosition(0);
+        carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        //carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+
+        boolean selected = false;
+
+        while (!selected) {
+            if (gamepad1.dpad_left) {
+                objectPosition = 0;
+                selected = true;
+            } else if (gamepad1.dpad_up) {
+                objectPosition = 1;
+                selected = true;
+            } else if (gamepad1.dpad_right) {
+                objectPosition = 2;
+                selected = true;
+            }
+        }
+
+
 
         drive.setPoseEstimate(new Pose2d());
 
+
         Trajectory traj1 = drive.trajectoryBuilder(new Pose2d())
-                .strafeRight(40)
+                .forward(30)
                 .build();
 
+        Trajectory right1 = drive.trajectoryBuilder(traj1.end().plus(new Pose2d(0, 0, Math.toRadians(-90))))
+                .forward(4)
+                .build();
+
+        Trajectory right2 = drive.trajectoryBuilder(right1.end())
+                .back(6.5)
+                .build();
+
+        Trajectory right3 = drive.trajectoryBuilder(right2.end().plus(new Pose2d(0, 0, Math.toRadians(90))))
+                .strafeRight(2.5)
+                .build();
+
+        Trajectory middle1 = drive.trajectoryBuilder(traj1.end())
+                .forward(3.5)
+                .build();
+
+        Trajectory left1 = drive.trajectoryBuilder(traj1.end().plus(new Pose2d(0, 0, Math.toRadians(90))))
+                .forward(4)
+                .build();
+
+        Trajectory left2 = drive.trajectoryBuilder(left1.end())
+                .back(6.5)
+                .build();
+
+        Trajectory left3 = drive.trajectoryBuilder(left2.end().plus(new Pose2d(0, 0, Math.toRadians(-90))))
+                .strafeLeft(2.5)
+                .build();
+
+
+        Trajectory lastTraj = traj1;
+
+        Trajectory traj4 = drive.trajectoryBuilder(lastTraj.end())
+                .back(30)
+                .build();
+
+        switch (objectPosition) {
+            case 0:
+                traj4 = drive.trajectoryBuilder(left3.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
+                        .back(25)
+                        .build();
+                break;
+            case 1:
+                traj4 = drive.trajectoryBuilder(middle1.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
+                        .back(28.5)
+                        .build();
+                break;
+            case 2:
+                traj4 = drive.trajectoryBuilder(right3.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
+                        .back(25)
+                        .build();
+                break;
+        }
+
+        Trajectory traj5 = drive.trajectoryBuilder(traj4.end().plus(new Pose2d(0, 0, Math.toRadians(-90)))) // red
+                .forward(24.5)
+                .build();
+
+        Trajectory leftEnd = drive.trajectoryBuilder(traj5.end())
+                .strafeLeft(38-2) // -offset
+                .build();
+
+        Trajectory middleEnd = drive.trajectoryBuilder(traj5.end())
+                .strafeLeft(33.25-2) // -offset
+                .build();
+
+        Trajectory rightEnd = drive.trajectoryBuilder(traj5.end())
+                .strafeLeft(22-2) // -offset
+                .build();
+
+        switch (objectPosition) {
+            case 0:
+                lastTraj = leftEnd;
+                break;
+            case 1:
+                lastTraj = middleEnd;
+                break;
+            case 2:
+                lastTraj = rightEnd;
+                break;
+        }
+
+        Trajectory traj7 = drive.trajectoryBuilder(lastTraj.end().plus(new Pose2d(0, 0, Math.toRadians(180))))
+                .back(9)
+                .build();
+
+        Trajectory traj8 = drive.trajectoryBuilder(traj7.end())
+                .forward(3)
+                .build();
+
+
+
+
+
+
+        telemetry.addData("Object Position", objectPosition);
+        telemetry.update();
 
 
         waitForStart();
 
         if(isStopRequested()) return;
 
+        down();
+        sleep(250);
+        closeGrip();
+        sleep(750);
+        carousel.setPower(1);
+        carousel.setTargetPosition(1000);
+        carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (carousel.isBusy()) {telemetry.addData("Slide Pos", carousel.getCurrentPosition());
+            telemetry.update();};
+        carousel.setPower(0);
+
         drive.followTrajectory(traj1);
+
+        switch (objectPosition) {
+            case 0:
+                drive.turn(Math.toRadians(90));
+                drive.followTrajectory(left1);
+                sleep(300);
+                dropPixel(0);
+                sleep(150);
+                drive.followTrajectory(left2);
+                drive.turn(Math.toRadians(-90));
+                drive.followTrajectory(left3);
+                break;
+            case 1:
+                sleep(300);
+                drive.followTrajectory(middle1);
+                dropPixel(0);
+                break;
+            case 2:
+                drive.turn(Math.toRadians(-90));
+                drive.followTrajectory(right1);
+                sleep(300);
+                dropPixel(0);
+                sleep(150);
+                drive.followTrajectory(right2);
+                drive.turn(Math.toRadians(90));
+                drive.followTrajectory(right3);
+                break;
+        }
+
+        drive.followTrajectory(traj4);
+        drive.turn(Math.toRadians(-90)); // red
+        drive.followTrajectory(traj5);
+
+        switch (objectPosition) {
+            case 0:
+                drive.followTrajectory(leftEnd);
+                break;
+            case 1:
+                drive.followTrajectory(middleEnd);
+                break;
+            case 2:
+                drive.followTrajectory(rightEnd);
+                break;
+        }
+
+        drive.turn(Math.toRadians(180));
+        drive.followTrajectory(traj7);
+
+
+//        while(distance > 2.5) {
+//            backup = drive.trajectoryBuilder(lastTraj2.end())
+//                    .back(0.75)
+//                    .build();
+//
+//            drive.followTrajectory(backup);
+//            lastTraj2 = backup;
+//
+//            cycles += 1;
+//            distance = distanceSensor.getDistance(DistanceUnit.INCH);
+//        }
+
+        Trajectory park = drive.trajectoryBuilder(traj8.end())
+                .strafeLeft(20+((3-objectPosition)*9.5))
+                .build();
+
+
+        carousel.setPower(1);
+        carousel.setTargetPosition(6000);
+        carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (carousel.isBusy()) {telemetry.addData("Slide Pos", carousel.getCurrentPosition());
+            telemetry.update();};
+        carousel.setPower(0);
+
+        sleep(500);
+
+
+
+        dropPixel(1);
+
+        carousel.setPower(1);
+        carousel.setTargetPosition(0);
+        carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        while (carousel.getCurrentPosition() > 3000) {};
+        drive.followTrajectory(traj8);
+
+
+
+        drive.followTrajectory(park);
+        while (carousel.isBusy()) {};
+        carousel.setPower(0);
+
+
+        // move slide
+        // drop pixel
+        // move slide
+
+
+
+
 
 
     }

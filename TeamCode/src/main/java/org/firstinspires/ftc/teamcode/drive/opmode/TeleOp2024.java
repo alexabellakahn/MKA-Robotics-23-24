@@ -22,7 +22,7 @@ public class TeleOp2024 extends LinearOpMode {
     boolean liftToggle = false;
     boolean gripToggle = false;
 
-    int liftUpPos = 1700;
+    int liftUpPos = -5725;
     boolean isCalibrated = false;
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -87,7 +87,7 @@ public class TeleOp2024 extends LinearOpMode {
     }
 
     public void closeGrip() { //close grabber
-        leftGrip.setPosition(.29); // .25
+        leftGrip.setPosition(.285); // .25
         rightGrip.setPosition(.91);
         gripToggle = true;
     }
@@ -128,12 +128,12 @@ public class TeleOp2024 extends LinearOpMode {
 
     public void launchPlane(){
 
-        plane.setPosition(0.3);
+        plane.setPosition(0.55);
 
         //plane.setPosition(0.20);
         sleep(800);
 
-        plane.setPosition(.675);
+        plane.setPosition(.775);
 
 
     }
@@ -169,7 +169,7 @@ public class TeleOp2024 extends LinearOpMode {
 
 
 
-
+        carousel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         carousel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         carousel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         carousel.setDirection(DcMotor.Direction.REVERSE);
@@ -185,9 +185,10 @@ public class TeleOp2024 extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        leftGrip.setPosition(.38);
+        leftGrip.setPosition(.285);
         rightGrip.setPosition(.81);
         lift.setPosition(.713);
+        plane.setPosition(.775);
 
         runtime.reset();
 
