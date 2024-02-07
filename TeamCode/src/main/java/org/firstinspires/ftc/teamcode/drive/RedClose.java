@@ -66,7 +66,7 @@ public class RedClose extends LinearOpMode {
     boolean liftToggle = false;
     boolean gripToggle = false;
 
-    int objectPosition = 0; // 0: left, 1: middle, 2: right
+    int objectPosition = 1; // 0: left, 1: middle, 2: right
 
 
 
@@ -85,7 +85,7 @@ public class RedClose extends LinearOpMode {
 
 
     public void openGrip1() { //open grabber
-        leftGrip.setPosition(.48); //need to test
+        leftGrip.setPosition(.43); //need to test
         rightGrip.setPosition(.76);
         gripToggle = false;
     }
@@ -110,7 +110,7 @@ public class RedClose extends LinearOpMode {
     }
 
     public void up() {
-        lift.setPosition(.715);
+        lift.setPosition(.7165);
         liftToggle = true;
     }
 
@@ -139,25 +139,29 @@ public class RedClose extends LinearOpMode {
         carousel = hardwareMap.get(DcMotorEx.class, "carousel");
         carousel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         carousel.setTargetPosition(0);
+        carousel.setPower(.8);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (carousel.isBusy()) {};
+        carousel.setPower(0);
+
 
 
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
-        boolean selected = false;
-
-        while (!selected) {
-            if (gamepad1.dpad_left) {
-                objectPosition = 0;
-                selected = true;
-            } else if (gamepad1.dpad_up) {
-                objectPosition = 1;
-                selected = true;
-            } else if (gamepad1.dpad_right) {
-                objectPosition = 2;
-                selected = true;
-            }
-        }
+//        boolean selected = false;
+//
+//        while (!selected) {
+//            if (gamepad1.dpad_left) {
+//                objectPosition = 0;
+//                selected = true;
+//            } else if (gamepad1.dpad_up) {
+//                objectPosition = 1;
+//                selected = true;
+//            } else if (gamepad1.dpad_right) {
+//                objectPosition = 2;
+//                selected = true;
+//            }
+//        }
 
 
 
@@ -165,15 +169,15 @@ public class RedClose extends LinearOpMode {
 
 
         Trajectory traj1 = drive.trajectoryBuilder(new Pose2d())
-                .forward(30)
+                .forward(27)
                 .build();
 
         Trajectory right1 = drive.trajectoryBuilder(traj1.end().plus(new Pose2d(0, 0, Math.toRadians(-90))))
-                .forward(4)
+                .forward(5.5)
                 .build();
 
         Trajectory right2 = drive.trajectoryBuilder(right1.end())
-                .back(6.5)
+                .back(8)
                 .build();
 
         Trajectory right3 = drive.trajectoryBuilder(right2.end().plus(new Pose2d(0, 0, Math.toRadians(90))))
@@ -181,15 +185,15 @@ public class RedClose extends LinearOpMode {
                 .build();
 
         Trajectory middle1 = drive.trajectoryBuilder(traj1.end())
-                .forward(3.5)
+                .forward(4.5)
                 .build();
 
         Trajectory left1 = drive.trajectoryBuilder(traj1.end().plus(new Pose2d(0, 0, Math.toRadians(90))))
-                .forward(4)
+                .forward(5.5)
                 .build();
 
         Trajectory left2 = drive.trajectoryBuilder(left1.end())
-                .back(6.5)
+                .back(8)
                 .build();
 
         Trajectory left3 = drive.trajectoryBuilder(left2.end().plus(new Pose2d(0, 0, Math.toRadians(-90))))
@@ -206,17 +210,17 @@ public class RedClose extends LinearOpMode {
         switch (objectPosition) {
             case 0:
                 traj4 = drive.trajectoryBuilder(left3.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
-                        .back(25)
+                        .back(23)
                         .build();
                 break;
             case 1:
                 traj4 = drive.trajectoryBuilder(middle1.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
-                        .back(28.5)
+                        .back(26.5)
                         .build();
                 break;
             case 2:
                 traj4 = drive.trajectoryBuilder(right3.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
-                        .back(25)
+                        .back(23)
                         .build();
                 break;
         }
@@ -226,15 +230,15 @@ public class RedClose extends LinearOpMode {
                 .build();
 
         Trajectory leftEnd = drive.trajectoryBuilder(traj5.end())
-                .strafeLeft(38-2) // -offset
+                .strafeLeft(28.5)
                 .build();
 
         Trajectory middleEnd = drive.trajectoryBuilder(traj5.end())
-                .strafeLeft(33.25-2) // -offset
+                .strafeLeft(21.25)
                 .build();
 
         Trajectory rightEnd = drive.trajectoryBuilder(traj5.end())
-                .strafeLeft(22-2) // -offset
+                .strafeLeft(13.5)
                 .build();
 
         switch (objectPosition) {
@@ -250,11 +254,11 @@ public class RedClose extends LinearOpMode {
         }
 
         Trajectory traj7 = drive.trajectoryBuilder(lastTraj.end().plus(new Pose2d(0, 0, Math.toRadians(180))))
-                .back(9)
+                .back(17.5)
                 .build();
 
         Trajectory traj8 = drive.trajectoryBuilder(traj7.end())
-                .forward(3)
+                .forward(5)
                 .build();
 
 
@@ -274,8 +278,8 @@ public class RedClose extends LinearOpMode {
         sleep(250);
         closeGrip();
         sleep(750);
-        carousel.setPower(1);
-        carousel.setTargetPosition(1000);
+        carousel.setPower(.8);
+        carousel.setTargetPosition(650);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (carousel.isBusy()) {telemetry.addData("Slide Pos", carousel.getCurrentPosition());
             telemetry.update();};
@@ -344,24 +348,26 @@ public class RedClose extends LinearOpMode {
 //        }
 
         Trajectory park = drive.trajectoryBuilder(traj8.end())
-                .strafeLeft(20+((3-objectPosition)*9.5))
+                .strafeLeft(5+((3-objectPosition)*9.5))
                 .build();
 
 
-        carousel.setPower(1);
-        carousel.setTargetPosition(6000);
+        carousel.setPower(.8);
+        carousel.setTargetPosition(6560);
+        sleep(500);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (carousel.isBusy()) {telemetry.addData("Slide Pos", carousel.getCurrentPosition());
             telemetry.update();};
+        sleep(250);
         carousel.setPower(0);
 
-        sleep(500);
+        sleep(250);
 
 
 
         dropPixel(1);
 
-        carousel.setPower(1);
+        carousel.setPower(.8);
         carousel.setTargetPosition(0);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 

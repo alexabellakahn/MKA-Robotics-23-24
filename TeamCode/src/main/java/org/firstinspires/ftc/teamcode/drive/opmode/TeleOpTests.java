@@ -1,19 +1,17 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
@@ -21,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@TeleOp(name = "MAIN", group = "Linear Opmode")
-public class TeleOp2024 extends LinearOpMode {
+@TeleOp(name = "TeleOp Tests", group = "Linear Opmode")
+public class TeleOpTests extends LinearOpMode {
 
     boolean liftToggle = false;
     boolean gripToggle = false;
@@ -50,27 +48,47 @@ public class TeleOp2024 extends LinearOpMode {
     private Encoder rightEncoder = null;
     private Encoder frontEncoder = null;
 
-    private boolean nearBoard;
+    SampleMecanumDrive drive;
+
+
+
+    private boolean nearBoard = false;
+    private double lastX;
+
 
     public void movement() {
-        double modifier = 1;//nearBoard ? 0.65 : 1;
-        double Lpower = 1*modifier;
-        double Rpower = 0.52*modifier;//*modifier;
+        double modifier =  nearBoard ? 0.65 : 1;
+        double Lpower = 1*modifier; //0.58;
+        double Rpower = .517*modifier; //0.3;
         boolean reverseStick = true;
 
         double r = Lpower * Math.hypot((!reverseStick) ? gamepad1.left_stick_x : gamepad1.right_stick_x, (!reverseStick) ? -gamepad1.left_stick_y : -gamepad1.right_stick_y);
         double robotAngle = Math.atan2((!reverseStick) ? -gamepad1.left_stick_y : -gamepad1.right_stick_y, (!reverseStick) ? gamepad1.left_stick_x : gamepad1.right_stick_x) + 3 * Math.PI / 4;
         double rightX = Rpower * ((!reverseStick) ? gamepad1.right_stick_x : gamepad1.left_stick_x) * 1;
         double rightY = Rpower * ((!reverseStick) ? gamepad1.right_stick_y : gamepad1.left_stick_y) * 1;
+
         double v1 = r * Math.cos(robotAngle) - rightX + rightY;
         double v2 = r * Math.sin(robotAngle) + rightX + rightY;
         double v3 = r * Math.sin(robotAngle) - rightX + rightY;
         double v4 = r * Math.cos(robotAngle) + rightX + rightY;
 
-        leftFront.setPower(v1);
-        rightFront.setPower(v2);
-        leftRear.setPower(v3);
-        rightRear.setPower(v4);
+        if (gamepad1.touchpad) {
+            drive.setMotorPowers(.5, .5, .5, .5);
+            drive.turn(Math.toRadians(90));
+        } else {
+            drive.setMotorPowers(v4, v2, v1, v3);
+        }
+
+
+
+
+//        leftFront.setPower(v1);
+//        rightFront.setPower(v2);
+//        leftRear.setPower(v3);
+//        rightRear.setPower(v4);
+
+
+
     }
 
     /*
@@ -94,16 +112,30 @@ public class TeleOp2024 extends LinearOpMode {
         carousel.setPower(0);
     }
 
-    public void closeGrip() { //close grabber
+    public void closeGrip1() { //close grabber
         leftGrip.setPosition(.285); // .25
         rightGrip.setPosition(.91);
         gripToggle = true;
     }
 
+    public void closeGrip2() { //close grabber
+        leftGrip.setPosition(.365); // .25
+        rightGrip.setPosition(.91);
+        gripToggle = true;
+    }
+
+
     public void openGrip() { //open grabber
         leftGrip.setPosition(.43); //need to test .48
         rightGrip.setPosition(.76);
         gripToggle = false;
+    }
+
+    public void dropPixels() { //open grabber
+        leftGrip.setPosition(.365);
+        sleep(300);
+        leftGrip.setPosition(.43); //need to test .48
+        gripToggle = true;
     }
 
     public void up() {
@@ -141,8 +173,6 @@ public class TeleOp2024 extends LinearOpMode {
 
 
 
-
-
     public void launchPlane(){
 
         plane.setPosition(0.55);
@@ -158,6 +188,7 @@ public class TeleOp2024 extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        drive = new SampleMecanumDrive(hardwareMap);
         telemetry.addData("Status", "Initialized", "haggis");
 
         // Initialize the hardware variables. Note that the strings used here as parameters
@@ -210,8 +241,10 @@ public class TeleOp2024 extends LinearOpMode {
 
         leftGrip.setPosition(.285);
         rightGrip.setPosition(.81);
-        down(); //lift.setPosition(.713);
+        down();
         plane.setPosition(.775);
+
+        drive.setPoseEstimate(new Pose2d());
 
         runtime.reset();
 
@@ -219,16 +252,9 @@ public class TeleOp2024 extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            myLocalizer.update();
-
-            Pose2d myPose = myLocalizer.getPoseEstimate();
-
-
-
-            nearBoard = myPose.getX() > 35;
+            drive.update();
 
             movement();
-
 
             /*
             Carousel code commented out
@@ -299,12 +325,12 @@ public class TeleOp2024 extends LinearOpMode {
 
             if (gamepad1.y) openGrip();
 
-            else if (gamepad1.a) closeGrip();
+            else if (gamepad1.a) closeGrip1();
 
             if (gamepad1.dpad_up) up();
 
             else if (gamepad1.dpad_down) {
-                closeGrip();
+                closeGrip1();
                 down();
             }
             /*
@@ -324,24 +350,52 @@ public class TeleOp2024 extends LinearOpMode {
             if (carousel.getCurrentPosition() > liftUpPos) {
                 down();
 //                if (carousel.getPower() > 0) {
-//                    closeGrip();
+//                    closeGrip1();
 //                }
             }
 
-            if (gamepad1.left_stick_button && gamepad1.right_stick_button) {
-                liftUpPos = carousel.getCurrentPosition();
-                isCalibrated = true;
+            int currentPos = carousel.getCurrentPosition();
+
+            if (currentPos > liftUpPos + 500 && currentPos < liftUpPos) {
+                double rumble = currentPos/(double) (liftUpPos + 500);
+                gamepad1.rumble(rumble, rumble, 200);
+            }
+
+//            if (gamepad1.left_stick_button && gamepad1.right_stick_button) {
+//                liftUpPos = carousel.getCurrentPosition();
+//                isCalibrated = true;
+//            }
+
+            if (gamepad1.right_stick_button) {
+                closeGrip2();
+            }
+
+            if (gamepad1.left_stick_button) {
+                closeGrip1();
             }
 
 
 
-            telemetry.addData("Calibrated", isCalibrated);
-            if (isCalibrated) {telemetry.addData("Calibrated liftUpPos", liftUpPos
-            );}
+
+
+            myLocalizer.update();
+
+            Pose2d myPose = myLocalizer.getPoseEstimate();
+
+
+            nearBoard = myPose.getX() > 35;
+
+
+            lastX = myPose.getX();
+
             telemetry.addData("x", myPose.getX());
             telemetry.addData("y", myPose.getY());
             telemetry.addData("heading", myPose.getHeading());
             telemetry.addData("Near Board", nearBoard);
+
+            telemetry.addData("Calibrated", isCalibrated);
+            if (isCalibrated) {telemetry.addData("Calibrated liftUpPos", liftUpPos
+            );}
             telemetry.addData("Slide Power", carousel.getPower());
             telemetry.addData("Slide Position", carousel.getCurrentPosition());
             telemetry.addData("RIGHT", rightGrip.getPosition());

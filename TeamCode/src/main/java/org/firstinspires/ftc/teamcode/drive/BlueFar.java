@@ -57,6 +57,11 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 
+//camera imports
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+
 @Autonomous(name = "BlueFar", group = "Linear Opmode")
 public class BlueFar extends LinearOpMode {
     private DcMotorEx carousel;
@@ -66,8 +71,9 @@ public class BlueFar extends LinearOpMode {
     boolean liftToggle = false;
     boolean gripToggle = false;
 
-    int objectPosition = 0; // 0: left, 1: middle, 2: right
+    int objectPosition = 1; // 0: left, 1: middle, 2: right
 
+    OpenCvCamera camera; //initialize camera var
 
 
 
@@ -85,7 +91,7 @@ public class BlueFar extends LinearOpMode {
 
 
     public void openGrip1() { //open grabber
-        leftGrip.setPosition(.48); //need to test
+        leftGrip.setPosition(.43); //need to test
         rightGrip.setPosition(.76);
         gripToggle = false;
     }
@@ -110,7 +116,7 @@ public class BlueFar extends LinearOpMode {
     }
 
     public void up() {
-        lift.setPosition(.715);
+        lift.setPosition(.7165);
         liftToggle = true;
     }
 
@@ -130,6 +136,10 @@ public class BlueFar extends LinearOpMode {
         carousel.setPower(0);
     }
 
+    // Name of the Webcam to be set in the config
+    String webcamName = "Webcam 1";
+    SleeveDetectionLeft sleeveDetection;
+
     @Override
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
@@ -141,23 +151,31 @@ public class BlueFar extends LinearOpMode {
         carousel.setTargetPosition(0);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        //camera stuff
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
+        sleeveDetection = new SleeveDetectionLeft(telemetry);
+
+        camera.setPipeline(sleeveDetection);
+
+
 
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
-        boolean selected = false;
-
-        while (!selected) {
-            if (gamepad1.dpad_left) {
-                objectPosition = 0;
-                selected = true;
-            } else if (gamepad1.dpad_up) {
-                objectPosition = 1;
-                selected = true;
-            } else if (gamepad1.dpad_right) {
-                objectPosition = 2;
-                selected = true;
-            }
-        }
+//        boolean selected = false;
+//
+//        while (!selected) {
+//            if (gamepad1.dpad_left) {
+//                objectPosition = 0;
+//                selected = true;
+//            } else if (gamepad1.dpad_up) {
+//                objectPosition = 1;
+//                selected = true;
+//            } else if (gamepad1.dpad_right) {
+//                objectPosition = 2;
+//                selected = true;
+//            }
+//        }
 
 
 
@@ -165,15 +183,15 @@ public class BlueFar extends LinearOpMode {
 
 
         Trajectory traj1 = drive.trajectoryBuilder(new Pose2d())
-                .forward(30)
+                .forward(27)
                 .build();
 
         Trajectory right1 = drive.trajectoryBuilder(traj1.end().plus(new Pose2d(0, 0, Math.toRadians(-90))))
-                .forward(4)
+                .forward(5)
                 .build();
 
         Trajectory right2 = drive.trajectoryBuilder(right1.end())
-                .back(6.5)
+                .back(7.5)
                 .build();
 
         Trajectory right3 = drive.trajectoryBuilder(right2.end().plus(new Pose2d(0, 0, Math.toRadians(90))))
@@ -181,15 +199,15 @@ public class BlueFar extends LinearOpMode {
                 .build();
 
         Trajectory middle1 = drive.trajectoryBuilder(traj1.end())
-                .forward(3.5)
+                .forward(4.5)
                 .build();
 
         Trajectory left1 = drive.trajectoryBuilder(traj1.end().plus(new Pose2d(0, 0, Math.toRadians(90))))
-                .forward(4)
+                .forward(5)
                 .build();
 
         Trajectory left2 = drive.trajectoryBuilder(left1.end())
-                .back(6.5)
+                .back(7.5)
                 .build();
 
         Trajectory left3 = drive.trajectoryBuilder(left2.end().plus(new Pose2d(0, 0, Math.toRadians(-90))))
@@ -206,17 +224,17 @@ public class BlueFar extends LinearOpMode {
         switch (objectPosition) {
             case 0:
                 traj4 = drive.trajectoryBuilder(left3.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
-                        .forward(37)
+                        .forward(22)
                         .build();
                 break;
             case 1:
                 traj4 = drive.trajectoryBuilder(middle1.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
-                        .forward(33.5)
+                        .forward(16.5)
                         .build();
                 break;
             case 2:
                 traj4 = drive.trajectoryBuilder(right3.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
-                        .forward(37)
+                        .forward(22)
                         .build();
                 break;
         }
@@ -226,15 +244,15 @@ public class BlueFar extends LinearOpMode {
                 .build();
 
         Trajectory leftEnd = drive.trajectoryBuilder(traj5.end())
-                .strafeLeft(42)
+                .strafeLeft(31)
                 .build();
 
         Trajectory middleEnd = drive.trajectoryBuilder(traj5.end())
-                .strafeLeft(33.25)
+                .strafeLeft(22.25)
                 .build();
 
         Trajectory rightEnd = drive.trajectoryBuilder(traj5.end())
-                .strafeLeft(26)
+                .strafeLeft(15)
                 .build();
 
         switch (objectPosition) {
@@ -250,11 +268,11 @@ public class BlueFar extends LinearOpMode {
         }
 
         Trajectory traj7 = drive.trajectoryBuilder(lastTraj.end().plus(new Pose2d(0, 0, Math.toRadians(180))))
-                .back(9)
+                .back(17.5)
                 .build();
 
         Trajectory traj8 = drive.trajectoryBuilder(traj7.end())
-                .forward(3)
+                .forward(5)
                 .build();
 
 
@@ -311,6 +329,13 @@ public class BlueFar extends LinearOpMode {
                 break;
         }
 
+        carousel.setPower(1);
+        carousel.setTargetPosition(300);
+        carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (carousel.isBusy()) {telemetry.addData("Slide Pos", carousel.getCurrentPosition());
+            telemetry.update();};
+        carousel.setPower(0);
+
         drive.followTrajectory(traj4);
         drive.turn(Math.toRadians(90));
         drive.followTrajectory(traj5);
@@ -349,7 +374,7 @@ public class BlueFar extends LinearOpMode {
 
 
         carousel.setPower(1);
-        carousel.setTargetPosition(6000);
+        carousel.setTargetPosition(6560);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (carousel.isBusy()) {telemetry.addData("Slide Pos", carousel.getCurrentPosition());
             telemetry.update();};
