@@ -163,7 +163,7 @@ public class TeleOpTests extends LinearOpMode {
 
         }
         else if (gamepad1.right_trigger != 0) {
-            if (carousel.getCurrentPosition() > -8525) {
+            if (carousel.getCurrentPosition() > -8390) {
                 carousel.setPower(-gamepad1.right_trigger);
             } else {
                 carousel.setPower(0);
