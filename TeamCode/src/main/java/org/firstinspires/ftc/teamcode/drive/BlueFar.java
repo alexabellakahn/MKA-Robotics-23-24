@@ -162,20 +162,20 @@ public class BlueFar extends LinearOpMode {
 
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
-//        boolean selected = false;
-//
-//        while (!selected) {
-//            if (gamepad1.dpad_left) {
-//                objectPosition = 0;
-//                selected = true;
-//            } else if (gamepad1.dpad_up) {
-//                objectPosition = 1;
-//                selected = true;
-//            } else if (gamepad1.dpad_right) {
-//                objectPosition = 2;
-//                selected = true;
-//            }
-//        }
+        boolean selected = false;
+
+        while (!selected) {
+            if (gamepad1.dpad_left) {
+                objectPosition = 0;
+                selected = true;
+            } else if (gamepad1.dpad_up) {
+                objectPosition = 1;
+                selected = true;
+            } else if (gamepad1.dpad_right) {
+                objectPosition = 2;
+                selected = true;
+            }
+        }
 
 
 
@@ -224,17 +224,17 @@ public class BlueFar extends LinearOpMode {
         switch (objectPosition) {
             case 0:
                 traj4 = drive.trajectoryBuilder(left3.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
-                        .forward(22)
+                        .forward(26)
                         .build();
                 break;
             case 1:
                 traj4 = drive.trajectoryBuilder(middle1.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
-                        .forward(16.5)
+                        .forward(20.5)
                         .build();
                 break;
             case 2:
                 traj4 = drive.trajectoryBuilder(right3.end().plus(new Pose2d(0, 0, Math.toRadians(0))))
-                        .forward(22)
+                        .forward(26)
                         .build();
                 break;
         }
@@ -248,11 +248,11 @@ public class BlueFar extends LinearOpMode {
                 .build();
 
         Trajectory middleEnd = drive.trajectoryBuilder(traj5.end())
-                .strafeLeft(22.25)
+                .strafeLeft(24.25)
                 .build();
 
         Trajectory rightEnd = drive.trajectoryBuilder(traj5.end())
-                .strafeLeft(15)
+                .strafeLeft(17)
                 .build();
 
         switch (objectPosition) {
@@ -329,6 +329,10 @@ public class BlueFar extends LinearOpMode {
                 break;
         }
 
+
+
+        drive.followTrajectory(traj4);
+
         carousel.setPower(1);
         carousel.setTargetPosition(300);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -336,7 +340,6 @@ public class BlueFar extends LinearOpMode {
             telemetry.update();};
         carousel.setPower(0);
 
-        drive.followTrajectory(traj4);
         drive.turn(Math.toRadians(90));
         drive.followTrajectory(traj5);
 

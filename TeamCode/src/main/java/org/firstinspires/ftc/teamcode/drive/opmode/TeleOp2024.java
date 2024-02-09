@@ -51,6 +51,7 @@ public class TeleOp2024 extends LinearOpMode {
     private Encoder frontEncoder = null;
 
     private boolean nearBoard;
+    private boolean resettingSlide = false;
 
     public void movement() {
         double modifier = 1;//nearBoard ? 0.65 : 1;
@@ -123,7 +124,7 @@ public class TeleOp2024 extends LinearOpMode {
 
     public void liftSlide() {
         if (gamepad1.left_trigger != 0) {
-            if (carousel.getCurrentPosition() <= 0) {
+            if (resettingSlide || carousel.getCurrentPosition() <= 0) {
                 carousel.setPower(gamepad1.left_trigger);
             } else {
                 carousel.setPower(0);
@@ -131,7 +132,7 @@ public class TeleOp2024 extends LinearOpMode {
 
         }
         else if (gamepad1.right_trigger != 0) {
-            if (carousel.getCurrentPosition() > -8390) {
+            if (resettingSlide || carousel.getCurrentPosition() > -8390) {
                 carousel.setPower(-gamepad1.right_trigger);
             } else {
                 carousel.setPower(0);
@@ -321,6 +322,17 @@ public class TeleOp2024 extends LinearOpMode {
             if (gamepad1.left_trigger != 0 || gamepad1.right_trigger != 0) {liftSlide();}
             else {carousel.setPower(0);}
 
+            if (gamepad1.share && gamepad1.options) {
+                resettingSlide = !resettingSlide;
+
+                if (!resettingSlide) {
+                    carousel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    carousel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    carousel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    carousel.setDirection(DcMotor.Direction.REVERSE);
+                }
+            }
+
             if (carousel.getCurrentPosition() > liftUpPos) {
                 down();
 //                if (carousel.getPower() > 0) {
@@ -336,6 +348,7 @@ public class TeleOp2024 extends LinearOpMode {
 
 
             telemetry.addData("Calibrated", isCalibrated);
+            telemetry.addData("resettingSlide", resettingSlide);
             if (isCalibrated) {telemetry.addData("Calibrated liftUpPos", liftUpPos
             );}
             telemetry.addData("x", myPose.getX());

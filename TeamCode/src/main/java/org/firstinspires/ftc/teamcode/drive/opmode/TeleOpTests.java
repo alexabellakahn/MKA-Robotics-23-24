@@ -54,6 +54,7 @@ public class TeleOpTests extends LinearOpMode {
 
     private boolean nearBoard = false;
     private double lastX;
+    private boolean resettingSlide = false;
 
 
     public void movement() {
@@ -374,6 +375,17 @@ public class TeleOpTests extends LinearOpMode {
                 closeGrip1();
             }
 
+            if (gamepad1.share && gamepad1.options) {
+                resettingSlide = !resettingSlide;
+
+                if (!resettingSlide) {
+                    carousel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    carousel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    carousel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    carousel.setDirection(DcMotor.Direction.REVERSE);
+                }
+            }
+
 
 
 
@@ -392,6 +404,7 @@ public class TeleOpTests extends LinearOpMode {
             telemetry.addData("y", myPose.getY());
             telemetry.addData("heading", myPose.getHeading());
             telemetry.addData("Near Board", nearBoard);
+            telemetry.addData("resettingSlide", resettingSlide);
 
             telemetry.addData("Calibrated", isCalibrated);
             if (isCalibrated) {telemetry.addData("Calibrated liftUpPos", liftUpPos

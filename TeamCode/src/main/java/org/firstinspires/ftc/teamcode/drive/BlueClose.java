@@ -147,20 +147,20 @@ public class BlueClose extends LinearOpMode {
 
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
-//        boolean selected = false;
-//
-//        while (!selected) {
-//            if (gamepad1.dpad_left) {
-//                objectPosition = 0;
-//                selected = true;
-//            } else if (gamepad1.dpad_up) {
-//                objectPosition = 1;
-//                selected = true;
-//            } else if (gamepad1.dpad_right) {
-//                objectPosition = 2;
-//                selected = true;
-//            }
-//        }
+        boolean selected = false;
+
+        while (!selected) {
+            if (gamepad1.dpad_left) {
+                objectPosition = 0;
+                selected = true;
+            } else if (gamepad1.dpad_up) {
+                objectPosition = 1;
+                selected = true;
+            } else if (gamepad1.dpad_right) {
+                objectPosition = 2;
+                selected = true;
+            }
+        }
 
 
 
