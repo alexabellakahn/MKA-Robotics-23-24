@@ -279,7 +279,7 @@ public class RedClose extends LinearOpMode {
         closeGrip();
         sleep(750);
         carousel.setPower(.8);
-        carousel.setTargetPosition(650);
+        carousel.setTargetPosition(390);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (carousel.isBusy()) {telemetry.addData("Slide Pos", carousel.getCurrentPosition());
             telemetry.update();};
@@ -348,12 +348,12 @@ public class RedClose extends LinearOpMode {
 //        }
 
         Trajectory park = drive.trajectoryBuilder(traj8.end())
-                .strafeLeft(5+((3-objectPosition)*9.5))
+                .strafeLeft(12+((3-objectPosition)*9.5))
                 .build();
 
 
         carousel.setPower(.8);
-        carousel.setTargetPosition(6560);
+        carousel.setTargetPosition(3410);
         sleep(500);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (carousel.isBusy()) {telemetry.addData("Slide Pos", carousel.getCurrentPosition());

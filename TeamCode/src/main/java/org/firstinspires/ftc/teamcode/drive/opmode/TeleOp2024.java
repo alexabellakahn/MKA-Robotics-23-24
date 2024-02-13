@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+//import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -44,7 +45,8 @@ public class TeleOp2024 extends LinearOpMode {
     private Servo rightGrip = null;
     private Servo leftGrip = null;
 
-    private DistanceSensor distanceSensor = null;
+    //private DistanceSensor distanceSensor = null;
+    private TouchSensor touchSensor = null;
 
     private Encoder leftEncoder = null;
     private Encoder rightEncoder = null;
@@ -56,7 +58,7 @@ public class TeleOp2024 extends LinearOpMode {
     public void movement() {
         double modifier = 1;//nearBoard ? 0.65 : 1;
         double Lpower = 1*modifier;
-        double Rpower = 0.52*modifier;//*modifier;
+        double Rpower = 1; //0.52*modifier;//*modifier;
         boolean reverseStick = true;
 
         double r = Lpower * Math.hypot((!reverseStick) ? gamepad1.left_stick_x : gamepad1.right_stick_x, (!reverseStick) ? -gamepad1.left_stick_y : -gamepad1.right_stick_y);
@@ -122,6 +124,14 @@ public class TeleOp2024 extends LinearOpMode {
         liftToggle = true;
     }
 
+    public void calibrateSlide() {
+        while(!touchSensor.isPressed()) {
+            carousel.setPower(1);
+        }
+        carousel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        carousel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
     public void liftSlide() {
         if (gamepad1.left_trigger != 0) {
             if (resettingSlide || carousel.getCurrentPosition() <= 0) {
@@ -146,7 +156,7 @@ public class TeleOp2024 extends LinearOpMode {
 
     public void launchPlane(){
 
-        plane.setPosition(0.55);
+        plane.setPosition(0.95);
 
         //plane.setPosition(0.20);
         sleep(800);
@@ -180,7 +190,8 @@ public class TeleOp2024 extends LinearOpMode {
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightEncoder"));
         frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frontEncoder"));
 
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+        //distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+        touchSensor = hardwareMap.get(TouchSensor.class, "touchSensor");
 
         rightEncoder.setDirection(Encoder.Direction.REVERSE);
         frontEncoder.setDirection(Encoder.Direction.REVERSE);
@@ -212,7 +223,8 @@ public class TeleOp2024 extends LinearOpMode {
         leftGrip.setPosition(.285);
         rightGrip.setPosition(.81);
         down(); //lift.setPosition(.713);
-        plane.setPosition(.775);
+        plane.setPosition(.325);
+        calibrateSlide();
 
         runtime.reset();
 
@@ -371,7 +383,8 @@ public class TeleOp2024 extends LinearOpMode {
             telemetry.addData("leftEncoder", leftEncoder.getCurrentPosition());
             telemetry.addData("rightEncoder", rightEncoder.getCurrentPosition());
             telemetry.addData("middleEncoder", frontEncoder.getCurrentPosition());
-            telemetry.addData("distanceSensor", distanceSensor.getDistance(DistanceUnit.INCH));
+            telemetry.addData("slideDown", touchSensor.isPressed());
+            //telemetry.addData("distanceSensor", distanceSensor.getDistance(DistanceUnit.INCH));
             telemetry.update();
         }
     }

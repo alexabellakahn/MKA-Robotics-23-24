@@ -66,7 +66,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 public class BlueFar extends LinearOpMode {
     private DcMotorEx carousel;
     private Servo lift, leftGrip, rightGrip;
-    private DistanceSensor distanceSensor;
+    //private DistanceSensor distanceSensor;
 
     boolean liftToggle = false;
     boolean gripToggle = false;
@@ -160,7 +160,9 @@ public class BlueFar extends LinearOpMode {
 
 
 
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
+
+
+        //distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
 
         boolean selected = false;
 
@@ -293,7 +295,7 @@ public class BlueFar extends LinearOpMode {
         closeGrip();
         sleep(750);
         carousel.setPower(1);
-        carousel.setTargetPosition(1000);
+        carousel.setTargetPosition(390);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (carousel.isBusy()) {telemetry.addData("Slide Pos", carousel.getCurrentPosition());
             telemetry.update();};
@@ -334,7 +336,7 @@ public class BlueFar extends LinearOpMode {
         drive.followTrajectory(traj4);
 
         carousel.setPower(1);
-        carousel.setTargetPosition(300);
+        carousel.setTargetPosition(225);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (carousel.isBusy()) {telemetry.addData("Slide Pos", carousel.getCurrentPosition());
             telemetry.update();};
@@ -372,12 +374,12 @@ public class BlueFar extends LinearOpMode {
 //        }
 
         Trajectory park = drive.trajectoryBuilder(traj8.end())
-                .strafeLeft(5+((3-objectPosition)*9.5))
+                .strafeLeft(12+((3-objectPosition)*9.5))
                 .build();
 
 
         carousel.setPower(1);
-        carousel.setTargetPosition(6560);
+        carousel.setTargetPosition(3410);
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (carousel.isBusy()) {telemetry.addData("Slide Pos", carousel.getCurrentPosition());
             telemetry.update();};
